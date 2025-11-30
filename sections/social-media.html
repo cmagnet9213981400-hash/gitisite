@@ -1,0 +1,469 @@
+<!-- 
+  =================================
+  ماژول: شبکه‌های اجتماعی (Social Media)
+  =================================
+  شامل: 
+  - کارت‌های شبکه اجتماعی با آیکون‌های ایرانی و خارجی
+  - مودال انتخاب شبکه و ورود آیدی
+  - تولید خودکار لینک برای هدایت به نرم‌افزار/سایت مربوطه
+-->
+<section class="section" id="section-UNIQUE_ID" data-section="social-media">
+    <!-- هندل جابجایی -->
+    <div class="drag-handle">
+        <i class="fas fa-arrows-alt-v"></i>
+    </div>
+    
+    <!-- عنوان سکشن -->
+    <div class="section-title">
+        <div class="section-title-text" contenteditable="true">شبکه‌های اجتماعی</div>
+        <div class="delete-section" onclick="deleteSection('section-UNIQUE_ID')">🗑️</div>
+    </div>
+    
+    <!-- محتوای اصلی -->
+    <div class="section-content">
+        <p class="social-desc" contenteditable="true">ما را در شبکه‌های اجتماعی دنبال کنید.</p>
+        
+        <!-- گرید کارت‌ها -->
+        <div class="social-grid" id="social-grid-UNIQUE_ID">
+            <!-- کارت‌ها اینجا اضافه می‌شوند -->
+        </div>
+
+        <!-- دکمه افزودن -->
+        <div class="social-controls">
+            <button class="btn-add-social" id="add-social-btn-UNIQUE_ID">
+                <i class="fas fa-plus-circle"></i> افزودن شبکه اجتماعی
+            </button>
+        </div>
+    </div>
+
+    <!-- مودال افزودن شبکه اجتماعی (داخل سکشن) -->
+    <div class="social-modal" id="modal-UNIQUE_ID">
+        <div class="social-modal-content">
+            <h3>افزودن شبکه اجتماعی</h3>
+            
+            <div class="form-group">
+                <label>انتخاب شبکه:</label>
+                <div class="custom-select-wrapper">
+                    <select id="platform-select-UNIQUE_ID" class="social-input">
+                        <option value="instagram">اینستاگرام (Instagram)</option>
+                        <option value="telegram">تلگرام (Telegram)</option>
+                        <option value="whatsapp">واتس‌اپ (WhatsApp)</option>
+                        <option value="eitaa">ایتا (Eitaa)</option>
+                        <option value="rubika">روبیکا (Rubika)</option>
+                        <option value="bale">بله (Bale)</option>
+                        <option value="soroush">سروش پلاس (Soroush+)</option>
+                        <option value="linkedin">لینکدین (LinkedIn)</option>
+                        <option value="twitter">ایکس (Twitter/X)</option>
+                        <option value="youtube">یوتیوب (YouTube)</option>
+                        <option value="aparat">آپارات (Aparat)</option>
+                    </select>
+                    <!-- محل نمایش آیکون انتخاب شده -->
+                    <div class="selected-icon-preview" id="icon-preview-UNIQUE_ID">
+                        <i class="fab fa-instagram"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label id="id-label-UNIQUE_ID">نام کاربری (ID):</label>
+                <input type="text" id="user-id-input-UNIQUE_ID" class="social-input" placeholder="مثلاً: my_page_id" dir="ltr">
+                <small class="input-hint" id="url-preview-UNIQUE_ID">https://instagram.com/...</small>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-save" id="btn-save-UNIQUE_ID">افزودن</button>
+                <button class="btn-cancel" id="btn-cancel-UNIQUE_ID">لغو</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        #section-UNIQUE_ID .social-desc {
+            margin-bottom: 25px;
+            opacity: 0.8;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+
+        #section-UNIQUE_ID .social-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        /* استایل کارت شبکه اجتماعی */
+        #section-UNIQUE_ID .social-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            min-width: 200px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            text-decoration: none;
+            color: var(--text-color);
+        }
+
+        #section-UNIQUE_ID .social-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        #section-UNIQUE_ID .social-icon-box {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        #section-UNIQUE_ID .social-info {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #section-UNIQUE_ID .social-name {
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 3px;
+        }
+
+        #section-UNIQUE_ID .social-id {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            direction: ltr;
+            text-align: left;
+        }
+
+        /* دکمه حذف کارت */
+        #section-UNIQUE_ID .btn-delete-card {
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            opacity: 0;
+            transition: all 0.2s;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        #section-UNIQUE_ID .social-card:hover .btn-delete-card {
+            opacity: 1;
+            top: 5px;
+            left: 5px;
+        }
+
+        /* کنترل‌ها */
+        #section-UNIQUE_ID .social-controls {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #section-UNIQUE_ID .btn-add-social {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #section-UNIQUE_ID .btn-add-social:hover {
+            background: var(--primary-color);
+        }
+
+        /* استایل مودال */
+        #section-UNIQUE_ID .social-modal {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            border-radius: 20px;
+        }
+
+        #section-UNIQUE_ID .social-modal.active {
+            display: flex;
+        }
+
+        #section-UNIQUE_ID .social-modal-content {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 25px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 350px;
+            color: var(--text-color);
+            text-align: right;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        #section-UNIQUE_ID .social-modal h3 {
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        #section-UNIQUE_ID .form-group { margin-bottom: 15px; }
+        #section-UNIQUE_ID .form-group label { display: block; margin-bottom: 5px; font-size: 0.85rem; opacity: 0.9; }
+        
+        #section-UNIQUE_ID .social-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            outline: none;
+        }
+
+        #section-UNIQUE_ID .custom-select-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        #section-UNIQUE_ID .social-input option {
+            background: #333; color: #fff;
+        }
+
+        #section-UNIQUE_ID .selected-icon-preview {
+            position: absolute;
+            left: 10px;
+            font-size: 20px;
+            pointer-events: none;
+        }
+
+        #section-UNIQUE_ID .input-hint {
+            display: block;
+            font-size: 0.75rem;
+            opacity: 0.6;
+            margin-top: 5px;
+            direction: ltr;
+            text-align: left;
+        }
+
+        #section-UNIQUE_ID .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+
+        #section-UNIQUE_ID .btn-save {
+            background: var(--button-color); color: white; border: none; padding: 8px 20px; border-radius: 8px; cursor: pointer;
+        }
+        #section-UNIQUE_ID .btn-cancel {
+            background: rgba(255,255,255,0.1); color: var(--text-color); border: 1px solid var(--glass-border); padding: 8px 20px; border-radius: 8px; cursor: pointer;
+        }
+
+        /* آیکون‌های SVG سفارشی برای شبکه‌های ایرانی که در FontAwesome نیستند */
+        .custom-svg-icon {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        /* Visitor Mode */
+        body.visitor-mode #section-UNIQUE_ID .social-controls,
+        body.visitor-mode #section-UNIQUE_ID .btn-delete-card,
+        body.visitor-mode #section-UNIQUE_ID .section-title,
+        body.visitor-mode #section-UNIQUE_ID .drag-handle,
+        body.visitor-mode #section-UNIQUE_ID .delete-section,
+        body.visitor-mode #section-UNIQUE_ID .social-modal {
+            display: none !important;
+        }
+        
+        body.visitor-mode #section-UNIQUE_ID .social-card {
+            pointer-events: auto; /* لینک‌ها کار کنند */
+        }
+    </style>
+
+    <script>
+        (function() {
+            const uid = 'UNIQUE_ID';
+            const grid = document.getElementById('social-grid-' + uid);
+            const addBtn = document.getElementById('add-social-btn-' + uid);
+            const modal = document.getElementById('modal-' + uid);
+            const saveBtn = document.getElementById('btn-save-' + uid);
+            const cancelBtn = document.getElementById('btn-cancel-' + uid);
+            const platformSelect = document.getElementById('platform-select-' + uid);
+            const userIdInput = document.getElementById('user-id-input-' + uid);
+            const iconPreview = document.getElementById('icon-preview-' + uid);
+            const urlPreview = document.getElementById('url-preview-' + uid);
+            const idLabel = document.getElementById('id-label-' + uid);
+
+            // اطلاعات پلتفرم‌ها (رنگ، آیکون، ساختار لینک)
+            const platforms = {
+                'instagram': { name: 'اینستاگرام', color: '#E1306C', iconClass: 'fab fa-instagram', urlPrefix: 'https://instagram.com/' },
+                'telegram': { name: 'تلگرام', color: '#0088cc', iconClass: 'fab fa-telegram', urlPrefix: 'https://t.me/' },
+                'whatsapp': { name: 'واتس‌اپ', color: '#25D366', iconClass: 'fab fa-whatsapp', urlPrefix: 'https://wa.me/', placeholder: 'شماره با کد کشور (989...)' },
+                'linkedin': { name: 'لینکدین', color: '#0077b5', iconClass: 'fab fa-linkedin', urlPrefix: 'https://linkedin.com/in/' },
+                'twitter': { name: 'ایکس (توییتر)', color: '#000000', iconClass: 'fab fa-x-twitter', urlPrefix: 'https://twitter.com/' },
+                'youtube': { name: 'یوتیوب', color: '#FF0000', iconClass: 'fab fa-youtube', urlPrefix: 'https://youtube.com/@' },
+                'aparat': { name: 'آپارات', color: '#ED145B', isCustom: true, urlPrefix: 'https://aparat.com/' }, // Custom SVG needed
+                'eitaa': { name: 'ایتا', color: '#FF8800', isCustom: true, urlPrefix: 'https://eitaa.com/' },
+                'rubika': { name: 'روبیکا', color: '#9933CC', isCustom: true, urlPrefix: 'https://rubika.ir/' },
+                'bale': { name: 'بله', color: '#56B559', isCustom: true, urlPrefix: 'https://ble.ir/' },
+                'soroush': { name: 'سروش پلاس', color: '#007EE5', isCustom: true, urlPrefix: 'https://splus.ir/' }
+            };
+
+            // SVG های اختصاصی برای پلتفرم‌های ایرانی (Base64 یا Path)
+            const customIcons = {
+                'eitaa': '<svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-6h2v6zm4 0h-2V7h2v10z"/></svg>', // Placeholder icon
+                'rubika': '<svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><circle cx="12" cy="12" r="10"/></svg>',
+                'bale': '<svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>',
+                'soroush': '<svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 2L2 22h20L12 2z"/></svg>',
+                'aparat': '<svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16" fill="white"/></svg>'
+            };
+
+            // بروزرسانی آیکون و راهنما در مودال
+            function updateModalUI() {
+                const key = platformSelect.value;
+                const p = platforms[key];
+                
+                // بروزرسانی آیکون
+                if (p.isCustom) {
+                    iconPreview.innerHTML = customIcons[key] || '<i class="fas fa-link"></i>';
+                } else {
+                    iconPreview.innerHTML = `<i class="${p.iconClass}"></i>`;
+                }
+                iconPreview.style.color = p.color;
+
+                // بروزرسانی راهنما
+                idLabel.textContent = (key === 'whatsapp') ? 'شماره تماس (بدون صفر و +):' : 'نام کاربری (ID):';
+                userIdInput.placeholder = p.placeholder || 'نام کاربری خود را وارد کنید';
+                
+                const currentVal = userIdInput.value || '...';
+                urlPreview.textContent = p.urlPrefix + currentVal;
+            }
+
+            platformSelect.addEventListener('change', updateModalUI);
+            userIdInput.addEventListener('input', updateModalUI);
+
+            // باز کردن مودال
+            addBtn.addEventListener('click', () => {
+                userIdInput.value = '';
+                updateModalUI();
+                modal.classList.add('active');
+            });
+
+            // بستن مودال
+            const closeModal = () => modal.classList.remove('active');
+            cancelBtn.addEventListener('click', closeModal);
+
+            // افزودن کارت جدید
+            saveBtn.addEventListener('click', () => {
+                const key = platformSelect.value;
+                const id = userIdInput.value.trim();
+                const p = platforms[key];
+
+                if (!id) {
+                    alert('لطفاً نام کاربری یا شماره را وارد کنید.');
+                    return;
+                }
+
+                // ساخت لینک نهایی
+                const finalUrl = p.urlPrefix + id;
+
+                // ساخت آیکون برای کارت
+                let iconHtml = '';
+                if (p.isCustom) {
+                    iconHtml = customIcons[key];
+                } else {
+                    iconHtml = `<i class="${p.iconClass}"></i>`;
+                }
+
+                const card = document.createElement('a');
+                card.className = 'social-card';
+                card.href = finalUrl;
+                card.target = '_blank'; // باز شدن در تب جدید
+                card.setAttribute('data-platform', key); // برای استفاده‌های بعدی
+                
+                card.innerHTML = `
+                    <button class="btn-delete-card" title="حذف">&times;</button>
+                    <div class="social-icon-box" style="background-color: ${p.color};">
+                        ${iconHtml}
+                    </div>
+                    <div class="social-info">
+                        <span class="social-name">${p.name}</span>
+                        <span class="social-id" dir="ltr">@${id}</span>
+                    </div>
+                `;
+
+                // هندل حذف
+                const deleteBtn = card.querySelector('.btn-delete-card');
+                deleteBtn.addEventListener('click', (e) => {
+                    e.preventDefault(); // جلوگیری از کلیک روی لینک
+                    e.stopPropagation();
+                    if(confirm('حذف شود؟')) card.remove();
+                });
+
+                // هندل کلیک در حالت بازدیدکننده (لینک خودکار کار می‌کند، اما برای اطمینان)
+                card.addEventListener('click', (e) => {
+                    // در حالت ادمین نباید لینک باز شود، فقط مودال حذف کار کند
+                    if (!document.body.classList.contains('visitor-mode')) {
+                        e.preventDefault();
+                    }
+                });
+
+                grid.appendChild(card);
+                closeModal();
+            });
+
+            // مقداردهی اولیه UI مودال
+            updateModalUI();
+
+            // فعال‌سازی دکمه‌های حذف برای کارت‌های لود شده (هنگام بازخوانی پروژه)
+            grid.querySelectorAll('.social-card').forEach(card => {
+                const deleteBtn = card.querySelector('.btn-delete-card');
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if(confirm('حذف شود؟')) card.remove();
+                    });
+                }
+                card.addEventListener('click', (e) => {
+                    if (!document.body.classList.contains('visitor-mode')) {
+                        e.preventDefault();
+                    }
+                });
+            });
+
+        })();
+    </script>
+</section>

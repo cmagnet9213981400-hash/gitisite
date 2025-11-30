@@ -1,0 +1,419 @@
+<!-- 
+  =================================
+  ماژول: گواهینامه‌ها (Certificates / Trust Seals)
+  =================================
+  شامل: 
+  - کارت‌های با قابلیت اجرای کد HTML (برای اینماد، SSL و ...)
+  - چیدمان وسط‌چین (Center Aligned)
+  - مودال ویرایش کد
+-->
+<section class="section" id="section-UNIQUE_ID" data-section="certificates">
+    <!-- هندل جابجایی -->
+    <div class="drag-handle">
+        <i class="fas fa-arrows-alt-v"></i>
+    </div>
+    
+    <!-- عنوان سکشن -->
+    <div class="section-title">
+        <div class="section-title-text" contenteditable="true">مجوزها و گواهینامه‌ها</div>
+        <div class="delete-section" onclick="deleteSection('section-UNIQUE_ID')">🗑️</div>
+    </div>
+    
+    <!-- محتوای اصلی -->
+    <div class="section-content">
+        <p class="cert-desc" contenteditable="true">برای اطمینان شما، دارای مجوزهای رسمی زیر هستیم</p>
+        
+        <div class="cert-grid" id="cert-grid-UNIQUE_ID">
+            <!-- کارت‌ها اینجا اضافه می‌شوند -->
+        </div>
+
+        <!-- دکمه افزودن -->
+        <div class="cert-controls">
+            <button class="btn-add-cert" id="add-cert-btn-UNIQUE_ID">
+                <i class="fas fa-plus-circle"></i> افزودن گواهینامه جدید
+            </button>
+        </div>
+    </div>
+
+    <!-- مودال ویرایش کد -->
+    <div class="cert-modal" id="modal-UNIQUE_ID">
+        <div class="cert-modal-content">
+            <h3>تنظیمات گواهینامه</h3>
+            
+            <div class="form-group">
+                <label>عنوان (اختیاری):</label>
+                <input type="text" id="cert-title-input-UNIQUE_ID" class="cert-input" placeholder="مثلاً: اینماد">
+            </div>
+
+            <div class="form-group">
+                <label>کد HTML/اسکریپت:</label>
+                <textarea id="cert-code-input-UNIQUE_ID" class="cert-textarea" placeholder="کد دریافتی از اینماد یا سایر سرویس‌ها را اینجا جایگذاری کنید..." dir="ltr"></textarea>
+                <small class="input-hint">توجه: برخی اسکریپت‌ها ممکن است در حالت ویرایش نمایش داده نشوند اما در خروجی نهایی کار می‌کنند.</small>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-save" id="btn-save-UNIQUE_ID">ذخیره</button>
+                <button class="btn-cancel" id="btn-cancel-UNIQUE_ID">لغو</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        #section-UNIQUE_ID .cert-desc {
+            text-align: center;
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+
+        /* گرید وسط‌چین */
+        #section-UNIQUE_ID .cert-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        /* کارت گواهینامه */
+        #section-UNIQUE_ID .cert-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 20px;
+            min-width: 150px;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        #section-UNIQUE_ID .cert-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* محتوای رندر شده HTML */
+        #section-UNIQUE_ID .cert-render {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        /* محدود کردن سایز تصاویر داخل کد کاربر */
+        #section-UNIQUE_ID .cert-render img {
+            max-width: 130px !important;
+            max-height: 130px !important;
+            object-fit: contain;
+            cursor: pointer;
+        }
+
+        #section-UNIQUE_ID .cert-title-display {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        /* دکمه‌های کارت */
+        #section-UNIQUE_ID .card-actions {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: flex;
+            gap: 5px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 10;
+        }
+
+        #section-UNIQUE_ID .cert-card:hover .card-actions {
+            opacity: 1;
+        }
+
+        #section-UNIQUE_ID .action-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: transform 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        #section-UNIQUE_ID .btn-edit { background: white; color: #333; }
+        #section-UNIQUE_ID .btn-delete { background: #ff6b6b; color: white; }
+        #section-UNIQUE_ID .action-btn:hover { transform: scale(1.15); }
+
+        /* کنترل افزودن */
+        #section-UNIQUE_ID .cert-controls {
+            text-align: center;
+            margin-top: 30px;
+            border-top: 1px dashed var(--glass-border);
+            padding-top: 20px;
+        }
+
+        #section-UNIQUE_ID .btn-add-cert {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #section-UNIQUE_ID .btn-add-cert:hover {
+            background: var(--primary-color);
+        }
+
+        /* مودال */
+        #section-UNIQUE_ID .cert-modal {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            border-radius: 20px;
+        }
+
+        #section-UNIQUE_ID .cert-modal.active { display: flex; }
+
+        #section-UNIQUE_ID .cert-modal-content {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 25px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            color: var(--text-color);
+            text-align: right;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        #section-UNIQUE_ID .cert-modal h3 {
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 10px;
+        }
+
+        #section-UNIQUE_ID .form-group { margin-bottom: 20px; }
+        #section-UNIQUE_ID .form-group label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 0.9rem; }
+        
+        #section-UNIQUE_ID .cert-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            outline: none;
+        }
+
+        #section-UNIQUE_ID .cert-textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            outline: none;
+            font-family: monospace;
+            resize: vertical;
+        }
+
+        #section-UNIQUE_ID .input-hint {
+            font-size: 0.8rem; opacity: 0.7; margin-top: 5px; display: block;
+        }
+
+        #section-UNIQUE_ID .modal-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            justify-content: flex-end;
+        }
+
+        #section-UNIQUE_ID .btn-save { background: var(--button-color); color: white; border: none; padding: 10px 25px; border-radius: 8px; cursor: pointer; }
+        #section-UNIQUE_ID .btn-cancel { background: rgba(255,255,255,0.1); color: var(--text-color); border: 1px solid var(--glass-border); padding: 10px 25px; border-radius: 8px; cursor: pointer; }
+
+        /* Visitor Mode Styles */
+        body.visitor-mode #section-UNIQUE_ID .cert-controls,
+        body.visitor-mode #section-UNIQUE_ID .card-actions,
+        body.visitor-mode #section-UNIQUE_ID .drag-handle,
+        body.visitor-mode #section-UNIQUE_ID .delete-section,
+        body.visitor-mode #section-UNIQUE_ID .section-title,
+        body.visitor-mode #section-UNIQUE_ID .cert-modal {
+            display: none !important;
+        }
+
+        /* حذف پس‌زمینه سکشن در خروجی */
+        body.visitor-mode #section-UNIQUE_ID {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+        }
+
+        /* حذف پس‌زمینه کارت‌ها در خروجی */
+        body.visitor-mode #section-UNIQUE_ID .cert-card {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+        }
+    </style>
+
+    <script>
+        (function() {
+            const uid = 'UNIQUE_ID';
+            const grid = document.getElementById('cert-grid-' + uid);
+            const addBtn = document.getElementById('add-cert-btn-' + uid);
+            const modal = document.getElementById('modal-' + uid);
+            const saveBtn = document.getElementById('btn-save-' + uid);
+            const cancelBtn = document.getElementById('btn-cancel-' + uid);
+            
+            const titleInput = document.getElementById('cert-title-input-' + uid);
+            const codeInput = document.getElementById('cert-code-input-' + uid);
+
+            let currentEditCard = null;
+
+            // --- مدیریت مودال ---
+            if (addBtn) {
+                addBtn.addEventListener('click', () => {
+                    currentEditCard = null;
+                    resetModal();
+                    modal.classList.add('active');
+                });
+            }
+
+            const closeModal = () => modal.classList.remove('active');
+            cancelBtn.addEventListener('click', closeModal);
+
+            function resetModal() {
+                titleInput.value = '';
+                codeInput.value = '';
+            }
+
+            // --- ذخیره کارت ---
+            saveBtn.addEventListener('click', () => {
+                const title = titleInput.value.trim();
+                const code = codeInput.value.trim();
+
+                if (!code) {
+                    alert('لطفاً کد HTML را وارد کنید.');
+                    return;
+                }
+
+                if (currentEditCard) {
+                    updateCard(currentEditCard, title, code);
+                } else {
+                    createCard(title, code);
+                }
+                closeModal();
+            });
+
+            function createCard(title, code) {
+                const card = document.createElement('div');
+                card.className = 'cert-card';
+                
+                // تگ textarea مخفی برای نگهداری کد اصلی جهت ویرایش بعدی
+                const hiddenCode = `<textarea class="raw-code" style="display:none;">${code}</textarea>`;
+                
+                card.innerHTML = `
+                    <div class="card-actions">
+                        <button class="action-btn btn-edit" title="ویرایش کد"><i class="fas fa-code"></i></button>
+                        <button class="action-btn btn-delete" title="حذف"><i class="fas fa-trash"></i></button>
+                    </div>
+                    <div class="cert-render">${code}</div>
+                    ${title ? `<div class="cert-title-display">${title}</div>` : ''}
+                    ${hiddenCode}
+                `;
+
+                grid.appendChild(card);
+                setupCardEvents(card);
+                
+                // اجرای اسکریپت‌های داخل کد (اگر وجود داشته باشد)
+                // برای اینماد معمولاً نیاز نیست، اما اگر اسکریپت باشد باید دوباره به دام اضافه شود
+                runScripts(card.querySelector('.cert-render'));
+            }
+
+            function updateCard(card, title, code) {
+                const renderDiv = card.querySelector('.cert-render');
+                const titleDiv = card.querySelector('.cert-title-display');
+                const rawCode = card.querySelector('.raw-code');
+
+                renderDiv.innerHTML = code;
+                rawCode.value = code;
+
+                if (title) {
+                    if (titleDiv) titleDiv.textContent = title;
+                    else {
+                        const newTitle = document.createElement('div');
+                        newTitle.className = 'cert-title-display';
+                        newTitle.textContent = title;
+                        card.insertBefore(newTitle, rawCode); // قبل از کد مخفی
+                    }
+                } else if (titleDiv) {
+                    titleDiv.remove();
+                }
+                
+                runScripts(renderDiv);
+            }
+
+            function setupCardEvents(card) {
+                const editBtn = card.querySelector('.btn-edit');
+                const deleteBtn = card.querySelector('.btn-delete');
+                const rawCode = card.querySelector('.raw-code');
+                const titleDiv = card.querySelector('.cert-title-display');
+
+                editBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    currentEditCard = card;
+                    codeInput.value = rawCode.value; // خواندن کد اصلی
+                    titleInput.value = titleDiv ? titleDiv.textContent : '';
+                    modal.classList.add('active');
+                });
+
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if(confirm('آیا حذف شود؟')) card.remove();
+                });
+            }
+
+            // تابع کمکی برای اجرای اسکریپت‌های injected شده
+            function runScripts(container) {
+                const scripts = container.querySelectorAll('script');
+                scripts.forEach(oldScript => {
+                    const newScript = document.createElement('script');
+                    Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                    newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                    oldScript.parentNode.replaceChild(newScript, oldScript);
+                });
+            }
+
+            // راه‌اندازی اولیه
+            grid.querySelectorAll('.cert-card').forEach(setupCardEvents);
+
+        })();
+    </script>
+</section>

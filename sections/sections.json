@@ -1,0 +1,74 @@
+[
+  {
+    "id": "about-us",
+    "name": "درباره ما",
+    "icon": "fas fa-address-card",
+    "file": "about-us.html"
+  },
+  {
+    "id": "testimonials",
+    "name": "نظرات مخاطبان",
+    "icon": "fas fa-comment-alt",
+    "file": "testimonials.html"
+  },
+  {
+    "id": "gallery",
+    "name": "گالری تصاویر",
+    "icon": "fas fa-images",
+    "file": "gallery.html"
+  },
+  {
+    "id": "slider",
+    "name": "اسلایدر تصاویر",
+    "icon": "fas fa-layer-group",
+    "file": "slider.html"
+  },
+  {
+    "id": "bank-info",
+    "name": "اطلاعات بانکی",
+    "icon": "fas fa-credit-card",
+    "file": "bank-info.html"
+  },
+  {
+    "id": "parallax",
+    "name": "پارالاکس",
+    "icon": "fas fa-image",
+    "file": "parallax.html"
+  },
+  {
+    "id": "social-media",
+    "name": "شبکه‌های اجتماعی",
+    "icon": "fas fa-share-alt",
+    "file": "social-media.html"
+  },
+  {
+    "id": "contact-map",
+    "name": "تماس و نقشه",
+    "icon": "fas fa-map-marked-alt",
+    "file": "contact-map.html"
+  },
+  {
+    "id": "clients",
+    "name": "مشتریان ما",
+    "icon": "fas fa-handshake",
+    "file": "clients.html"
+  },
+  {
+    "id": "achievements",
+    "name": "آمار و دستاوردها",
+    "icon": "fas fa-trophy",
+    "file": "achievements.html"
+  },
+  {
+    "id": "video-gallery",
+    "name": "گالری ویدیو",
+    "icon": "fas fa-video",
+    "file": "video-gallery.html"
+  },
+  {
+    "id": "certificates",
+    "name": "گواهینامه‌ها (HTML)",
+    "icon": "fas fa-certificate",
+    "file": "certificates.html"
+  }
+]

@@ -1,0 +1,476 @@
+<!-- 
+  =================================
+  ماژول: گالری تصاویر (Gallery)
+  =================================
+  شامل: 
+  - نمایش شبکه‌ای تصاویر
+  - لایت‌باکس تمام صفحه (با انتقال به body)
+  - پس‌زمینه ۸۰٪ تیره
+  - دکمه‌های ناوبری
+  - فشرده‌سازی خودکار
+-->
+<section class="section" id="section-UNIQUE_ID" data-section="gallery">
+    <!-- هندل جابجایی -->
+    <div class="drag-handle">
+        <i class="fas fa-arrows-alt-v"></i>
+    </div>
+    
+    <!-- عنوان سکشن -->
+    <div class="section-title">
+        <div class="section-title-text" contenteditable="true">گالری تصاویر</div>
+        <div class="delete-section" onclick="deleteSection('section-UNIQUE_ID')">🗑️</div>
+    </div>
+    
+    <!-- محتوای اصلی -->
+    <div class="section-content">
+        <p class="gallery-desc" contenteditable="true">برای مشاهده تصاویر در اندازه کامل روی آن‌ها کلیک کنید.</p>
+        
+        <!-- شبکه تصاویر (Thumbnails) -->
+        <div class="gallery-grid" id="g-grid-UNIQUE_ID">
+            <!-- تصاویر اینجا اضافه می‌شوند -->
+        </div>
+
+        <div class="gallery-controls">
+            <button class="g-add-btn" id="g-add-btn-UNIQUE_ID">
+                <i class="fas fa-plus-circle"></i> افزودن تصویر جدید
+                <input type="file" accept="image/*" id="g-upload-UNIQUE_ID" multiple style="display: none;">
+            </button>
+        </div>
+    </div>
+
+    <!-- لایت‌باکس (نمایش تمام صفحه) -->
+    <div class="g-lightbox" id="g-lightbox-UNIQUE_ID">
+        <span class="g-close-btn" id="g-close-UNIQUE_ID">&times;</span>
+        
+        <button class="g-nav-btn g-prev" id="g-prev-UNIQUE_ID">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+        
+        <img class="g-lightbox-img" id="g-lightbox-img-UNIQUE_ID" src="">
+        
+        <button class="g-nav-btn g-next" id="g-next-UNIQUE_ID">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        
+        <div class="g-caption" id="g-caption-UNIQUE_ID"></div>
+    </div>
+
+    <!-- استایل‌های اختصاصی گالری -->
+    <style>
+        #section-UNIQUE_ID .gallery-desc {
+            margin-bottom: 20px;
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        #section-UNIQUE_ID .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        #section-UNIQUE_ID .g-item {
+            position: relative;
+            aspect-ratio: 1; /* مربع */
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 1px solid var(--glass-border);
+            transition: transform 0.3s ease;
+            background: rgba(0,0,0,0.1);
+        }
+
+        #section-UNIQUE_ID .g-item:hover {
+            transform: scale(1.03);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        #section-UNIQUE_ID .g-thumb {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: filter 0.3s ease;
+        }
+
+        #section-UNIQUE_ID .g-item:hover .g-thumb {
+            filter: brightness(0.8);
+        }
+
+        #section-UNIQUE_ID .g-delete-item {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: rgba(255, 0, 0, 0.7);
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 2;
+        }
+
+        #section-UNIQUE_ID .g-item:hover .g-delete-item {
+            opacity: 1;
+        }
+
+        #section-UNIQUE_ID .gallery-controls {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed var(--glass-border);
+        }
+
+        #section-UNIQUE_ID .g-add-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.2s;
+        }
+
+        #section-UNIQUE_ID .g-add-btn:hover {
+            transform: translateY(-3px);
+            opacity: 0.9;
+        }
+
+        /* استایل لایت‌باکس (تمام صفحه و تیره) */
+        /* نکته: کلاس‌های لایت‌باکس گلوبال هستند تا وقتی به بادی منتقل می‌شوند استایل خود را از دست ندهند */
+        .g-lightbox {
+            display: none;
+            position: fixed !important; /* اجباری */
+            z-index: 2147483647 !important; /* بالاترین لایه ممکن */
+            left: 0 !important;
+            top: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            background-color: rgba(0, 0, 0, 0.8) !important; /* ۸۰٪ تیره */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            margin: 0 !important;
+            padding: 0 !important;
+            transform: none !important; /* جلوگیری از تاثیر ترنسفرم والد */
+        }
+
+        .g-lightbox.active {
+            display: flex !important;
+        }
+
+        .g-lightbox-img {
+            max-width: 90vw;
+            max-height: 90vh;
+            border-radius: 5px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            object-fit: contain;
+            animation: zoomIn 0.3s ease;
+        }
+
+        @keyframes zoomIn {
+            from {transform: scale(0.9); opacity: 0;}
+            to {transform: scale(1); opacity: 1;}
+        }
+
+        .g-close-btn {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #ffffff;
+            font-size: 45px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 2147483647;
+            line-height: 1;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .g-close-btn:hover {
+            color: #ff6b6b;
+            transform: scale(1.1);
+        }
+
+        .g-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: none;
+            font-size: 30px;
+            padding: 20px;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            user-select: none;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2147483647;
+        }
+
+        .g-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .g-prev { left: 30px; }
+        .g-next { right: 30px; }
+
+        .g-caption {
+            color: #ccc;
+            margin-top: 15px;
+            font-size: 16px;
+            text-align: center;
+            position: absolute;
+            bottom: 20px;
+        }
+
+        @media print {
+            .g-lightbox { display: none !important; }
+        }
+        
+        @media (max-width: 768px) {
+            .g-nav-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+                padding: 10px;
+            }
+            .g-prev { left: 10px; }
+            .g-next { right: 10px; }
+            .g-lightbox-img {
+                max-width: 95vw;
+                max-height: 80vh;
+            }
+        }
+    </style>
+
+    <!-- منطق جاوااسکریپت گالری -->
+    <script>
+        (function() {
+            const uid = 'UNIQUE_ID';
+            const section = document.getElementById('section-' + uid);
+            const grid = document.getElementById('g-grid-' + uid);
+            const addBtn = document.getElementById('g-add-btn-' + uid);
+            const uploadInput = document.getElementById('g-upload-' + uid);
+            
+            // المان‌های لایت‌باکس
+            const lightbox = document.getElementById('g-lightbox-' + uid);
+            const lightboxImg = document.getElementById('g-lightbox-img-' + uid);
+            const closeBtn = document.getElementById('g-close-' + uid);
+            const prevBtn = document.getElementById('g-prev-' + uid);
+            const nextBtn = document.getElementById('g-next-' + uid);
+            const caption = document.getElementById('g-caption-' + uid);
+
+            let galleryImages = []; 
+            let currentImageIndex = 0;
+
+            // --- مدیریت افزودن تصویر ---
+            if (addBtn) {
+                addBtn.addEventListener('click', () => uploadInput.click());
+            }
+
+            if (uploadInput) {
+                uploadInput.addEventListener('change', (e) => {
+                    const files = Array.from(e.target.files);
+                    if (files.length === 0) return;
+                    files.forEach(file => {
+                        compressImageToSize(file, 300, (compressedUrl) => {
+                            addImageToGrid(compressedUrl, file.name);
+                            if (typeof window.storeUploadedFile === 'function') {
+                                window.storeUploadedFile('gallery-' + Date.now() + Math.random().toString(36).substr(2, 5), file.name, compressedUrl, file.type);
+                            }
+                        });
+                    });
+                    e.target.value = '';
+                });
+            }
+
+            function addImageToGrid(url, name) {
+                galleryImages.push({url: url, name: name});
+                const index = galleryImages.length - 1;
+                const item = document.createElement('div');
+                item.className = 'g-item';
+                item.dataset.index = index;
+                item.innerHTML = `
+                    <img src="${url}" class="g-thumb" alt="${name || 'image'}">
+                    <div class="g-delete-item" title="حذف تصویر">&times;</div>
+                `;
+
+                item.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('g-delete-item')) return;
+                    const clickedIdx = parseInt(item.dataset.index);
+                    openLightbox(clickedIdx);
+                });
+
+                item.querySelector('.g-delete-item').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    item.remove();
+                    rebuildGalleryData();
+                });
+
+                grid.appendChild(item);
+            }
+
+            function rebuildGalleryData() {
+                galleryImages = [];
+                const items = grid.querySelectorAll('.g-item');
+                items.forEach((item, idx) => {
+                    const img = item.querySelector('img');
+                    galleryImages.push({url: img.src, name: img.alt});
+                    item.dataset.index = idx; 
+                });
+            }
+
+            // --- منطق لایت‌باکس ---
+
+            function openLightbox(index) {
+                if (index < 0 || index >= galleryImages.length) return;
+                currentImageIndex = index;
+                updateLightboxImage();
+                
+                // انتقال قطعی به body
+                // این کار باعث می‌شود لایت‌باکس از داخل سکشن خارج شده و فرزند مستقیم body شود
+                if (lightbox.parentElement !== document.body) {
+                    document.body.appendChild(lightbox);
+                }
+                
+                lightbox.classList.add('active');
+                document.body.style.overflow = 'hidden'; 
+            }
+
+            function closeLightbox() {
+                lightbox.classList.remove('active');
+                document.body.style.overflow = '';
+                
+                // بازگرداندن لایت‌باکس به داخل سکشن
+                // این مرحله برای ذخیره‌سازی صحیح پروژه حیاتی است
+                setTimeout(() => {
+                    if(section && lightbox) {
+                        section.appendChild(lightbox);
+                    }
+                }, 300);
+            }
+
+            function updateLightboxImage() {
+                const imgData = galleryImages[currentImageIndex];
+                lightboxImg.src = imgData.url;
+                if (caption) caption.textContent = imgData.name || '';
+            }
+
+            function showNext() {
+                if (galleryImages.length === 0) return;
+                currentImageIndex = (currentImageIndex + 1) % galleryImages.length;
+                updateLightboxImage();
+            }
+
+            function showPrev() {
+                if (galleryImages.length === 0) return;
+                currentImageIndex = (currentImageIndex - 1 + galleryImages.length) % galleryImages.length;
+                updateLightboxImage();
+            }
+
+            // رویدادهای لایت‌باکس
+            if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
+            if (nextBtn) nextBtn.addEventListener('click', showNext);
+            if (prevBtn) prevBtn.addEventListener('click', showPrev);
+
+            if (lightbox) {
+                lightbox.addEventListener('click', (e) => {
+                    if (e.target === lightbox) closeLightbox();
+                });
+            }
+
+            document.addEventListener('keydown', (e) => {
+                if (!lightbox || !lightbox.classList.contains('active')) return;
+                if (e.key === 'Escape') closeLightbox();
+                if (e.key === 'ArrowLeft') showNext();
+                if (e.key === 'ArrowRight') showPrev();
+            });
+
+            // مدیریت حذف سکشن: اگر سکشن حذف شد، لایت‌باکس هم اگر باز است حذف شود
+            if (section) {
+                const deleteBtn = section.querySelector('.delete-section');
+                if(deleteBtn) {
+                    deleteBtn.addEventListener('click', () => {
+                        if(lightbox && lightbox.parentElement === document.body) {
+                            lightbox.remove();
+                            document.body.style.overflow = '';
+                        }
+                    });
+                }
+            }
+
+            // --- تابع فشرده‌سازی ---
+            function compressImageToSize(file, maxKB, callback) {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        const MAX_WIDTH = 1920; const MAX_HEIGHT = 1080;
+                        if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+                            if (width / height > MAX_WIDTH / MAX_HEIGHT) {
+                                height = Math.round((height * MAX_WIDTH) / width); width = MAX_WIDTH;
+                            } else {
+                                width = Math.round((width * MAX_HEIGHT) / height); height = MAX_HEIGHT;
+                            }
+                        }
+                        canvas.width = width; canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        let quality = 0.9;
+                        let dataUrl = canvas.toDataURL('image/jpeg', quality);
+                        let sizeKB = dataUrl.length * 0.75 / 1024;
+                        while (sizeKB > maxKB && quality > 0.1) {
+                            quality -= 0.05;
+                            dataUrl = canvas.toDataURL('image/jpeg', quality);
+                            sizeKB = dataUrl.length * 0.75 / 1024;
+                        }
+                        callback(dataUrl);
+                    };
+                };
+            }
+
+            // بازسازی گالری هنگام لود (Re-hydration)
+            setTimeout(() => {
+                const existingImages = grid.querySelectorAll('.g-item img');
+                if (existingImages.length > 0) {
+                    rebuildGalleryData();
+                    const items = grid.querySelectorAll('.g-item');
+                    items.forEach(item => {
+                        item.onclick = (evt) => {
+                            if (evt.target.classList.contains('g-delete-item')) return;
+                            const idx = parseInt(item.dataset.index);
+                            openLightbox(idx);
+                        };
+                        item.querySelector('.g-delete-item').onclick = (e) => {
+                            e.stopPropagation();
+                            item.remove();
+                            rebuildGalleryData();
+                        };
+                    });
+                }
+            }, 500);
+        })();
+    </script>
+</section>

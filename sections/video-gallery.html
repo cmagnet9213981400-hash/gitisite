@@ -1,0 +1,741 @@
+<!-- 
+  =================================
+  ماژول: گالری ویدیو (Video Gallery)
+  =================================
+  شامل: 
+  - دریافت خودکار عنوان و تصویر (بدون فیلد عنوان در مودال)
+  - عنوان قابل ویرایش روی کارت (ContentEditable)
+  - استخراج فریم اول برای فایل‌های مستقیم
+  - لایت‌باکس پخش ویدیو
+  - ارتفاع بلندتر سکشن
+-->
+<section class="section" id="section-UNIQUE_ID" data-section="video-gallery">
+    <!-- هندل جابجایی -->
+    <div class="drag-handle">
+        <i class="fas fa-arrows-alt-v"></i>
+    </div>
+    
+    <!-- عنوان سکشن -->
+    <div class="section-title">
+        <div class="section-title-text" contenteditable="true">گالری ویدیو</div>
+        <div class="delete-section" onclick="deleteSection('section-UNIQUE_ID')">🗑️</div>
+    </div>
+    
+    <!-- محتوای اصلی -->
+    <div class="section-content">
+        <div class="video-grid" id="video-grid-UNIQUE_ID">
+            <!-- کارت‌ها اینجا اضافه می‌شوند -->
+        </div>
+
+        <!-- دکمه افزودن -->
+        <div class="video-controls">
+            <button class="btn-add-video" id="add-video-btn-UNIQUE_ID">
+                <i class="fas fa-plus-circle"></i> افزودن ویدیو جدید
+            </button>
+        </div>
+    </div>
+
+    <!-- مودال افزودن/ویرایش ویدیو -->
+    <div class="video-modal" id="modal-UNIQUE_ID">
+        <div class="video-modal-content">
+            <h3>مدیریت ویدیو</h3>
+            
+            <div class="form-group">
+                <label>لینک ویدیو (آپارات، یوتیوب یا لینک مستقیم):</label>
+                <div class="url-input-wrapper">
+                    <input type="text" id="video-url-input-UNIQUE_ID" class="video-input" placeholder="https://www.aparat.com/v/..." dir="ltr">
+                    <div class="url-spinner" id="url-spinner-UNIQUE_ID"></div>
+                </div>
+                <small class="input-hint" id="video-meta-hint-UNIQUE_ID">لینک را وارد کنید. عنوان و تصویر به صورت خودکار دریافت می‌شوند.</small>
+            </div>
+
+            <!-- فیلد مخفی برای نگهداری عنوان و کاور خودکار -->
+            <input type="hidden" id="auto-title-UNIQUE_ID">
+            <input type="hidden" id="auto-cover-UNIQUE_ID">
+
+            <div class="form-group">
+                <label>تصویر کاور (اختیاری - در صورت عدم وجود تصویر خودکار):</label>
+                <div class="cover-upload-box" id="cover-upload-box-UNIQUE_ID">
+                    <img src="" id="cover-preview-UNIQUE_ID" class="cover-preview" style="display: none;">
+                    <div class="upload-placeholder">
+                        <i class="fas fa-image"></i>
+                        <span>انتخاب تصویر دستی</span>
+                    </div>
+                    <input type="file" accept="image/*" id="cover-input-UNIQUE_ID" style="display: none;">
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-save" id="btn-save-UNIQUE_ID">ذخیره</button>
+                <button class="btn-cancel" id="btn-cancel-UNIQUE_ID">لغو</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- لایت‌باکس پخش ویدیو -->
+    <div class="video-lightbox" id="lightbox-UNIQUE_ID">
+        <div class="lightbox-content">
+            <span class="lightbox-close" id="lightbox-close-UNIQUE_ID">&times;</span>
+            <div class="video-wrapper" id="lightbox-video-container-UNIQUE_ID">
+                <!-- ویدیو اینجا لود می‌شود -->
+            </div>
+        </div>
+    </div>
+
+    <style>
+        #section-UNIQUE_ID {
+            min-height: 600px; /* افزایش ارتفاع سکشن */
+        }
+
+        #section-UNIQUE_ID .section-content {
+            padding-bottom: 60px;
+        }
+
+        #section-UNIQUE_ID .video-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            min-height: 200px;
+            padding: 20px;
+        }
+
+        /* کارت ویدیو */
+        #section-UNIQUE_ID .video-card {
+            width: 320px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        #section-UNIQUE_ID .video-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+            border-color: var(--primary-color);
+        }
+
+        #section-UNIQUE_ID .video-thumbnail-box {
+            width: 100%;
+            height: 200px; /* ارتفاع بیشتر تصویر */
+            position: relative;
+            background: #000;
+            overflow: hidden;
+        }
+
+        #section-UNIQUE_ID .video-thumbnail {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.9;
+            transition: opacity 0.3s, transform 0.5s;
+        }
+
+        #section-UNIQUE_ID .video-card:hover .video-thumbnail {
+            opacity: 0.7;
+            transform: scale(1.05);
+        }
+
+        #section-UNIQUE_ID .play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 50px;
+            color: white;
+            text-shadow: 0 2px 15px rgba(0,0,0,0.6);
+            pointer-events: none;
+            transition: transform 0.3s;
+            opacity: 0.9;
+        }
+
+        #section-UNIQUE_ID .video-card:hover .play-icon {
+            transform: translate(-50%, -50%) scale(1.1);
+            color: var(--primary-color);
+        }
+
+        #section-UNIQUE_ID .video-info {
+            padding: 15px;
+            text-align: right;
+            background: rgba(0,0,0,0.2);
+        }
+
+        #section-UNIQUE_ID .video-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--text-color);
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            direction: rtl;
+            outline: none; /* برای حالت ویرایش */
+            cursor: text;
+        }
+        
+        #section-UNIQUE_ID .video-title:focus {
+            white-space: normal; /* هنگام ویرایش متن کامل دیده شود */
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+
+        /* دکمه‌های کارت */
+        #section-UNIQUE_ID .card-actions {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 5;
+        }
+
+        #section-UNIQUE_ID .video-card:hover .card-actions {
+            opacity: 1;
+        }
+
+        #section-UNIQUE_ID .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: transform 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        #section-UNIQUE_ID .btn-edit { background: white; color: #333; }
+        #section-UNIQUE_ID .btn-delete { background: #ff6b6b; color: white; }
+        #section-UNIQUE_ID .action-btn:hover { transform: scale(1.15); }
+
+        /* کنترل افزودن */
+        #section-UNIQUE_ID .video-controls {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        #section-UNIQUE_ID .btn-add-video {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        #section-UNIQUE_ID .btn-add-video:hover {
+            background: var(--primary-color);
+        }
+
+        /* مودال */
+        #section-UNIQUE_ID .video-modal {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+        }
+
+        #section-UNIQUE_ID .video-modal.active { display: flex; }
+
+        #section-UNIQUE_ID .video-modal-content {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 450px;
+            color: var(--text-color);
+            text-align: right;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.6);
+        }
+
+        #section-UNIQUE_ID .form-group { margin-bottom: 20px; position: relative; }
+        #section-UNIQUE_ID .form-group label { display: block; margin-bottom: 8px; font-size: 0.95rem; font-weight: bold; }
+        
+        #section-UNIQUE_ID .url-input-wrapper { position: relative; }
+        
+        #section-UNIQUE_ID .video-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        #section-UNIQUE_ID .video-input:focus { border-color: var(--primary-color); }
+
+        /* اسپینر لودینگ */
+        #section-UNIQUE_ID .url-spinner {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+        @keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
+
+        #section-UNIQUE_ID .input-hint {
+            font-size: 0.8rem; opacity: 0.7; margin-top: 5px; display: block;
+        }
+
+        #section-UNIQUE_ID .cover-upload-box {
+            width: 100%;
+            height: 180px;
+            border: 2px dashed var(--glass-border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            background: rgba(0,0,0,0.2);
+            overflow: hidden;
+            transition: background 0.3s;
+        }
+        #section-UNIQUE_ID .cover-upload-box:hover { background: rgba(255,255,255,0.05); }
+
+        #section-UNIQUE_ID .cover-preview {
+            width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;
+        }
+
+        #section-UNIQUE_ID .upload-placeholder {
+            text-align: center; opacity: 0.7; display: flex; flex-direction: column; align-items: center; gap: 10px;
+        }
+        #section-UNIQUE_ID .upload-placeholder i { font-size: 2rem; }
+
+        #section-UNIQUE_ID .modal-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            justify-content: flex-end;
+        }
+
+        #section-UNIQUE_ID .btn-save { background: var(--button-color); color: white; border: none; padding: 10px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        #section-UNIQUE_ID .btn-cancel { background: rgba(255,255,255,0.1); color: var(--text-color); border: 1px solid var(--glass-border); padding: 10px 25px; border-radius: 8px; cursor: pointer; }
+
+        /* لایت‌باکس */
+        .video-lightbox {
+            display: none;
+            position: fixed;
+            z-index: 100000;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.95);
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .video-lightbox.active { display: flex; }
+
+        .lightbox-content {
+            position: relative;
+            width: 90%;
+            max-width: 960px;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            border-radius: 12px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.7);
+        }
+
+        .video-wrapper { width: 100%; height: 100%; border-radius: 12px; overflow: hidden; }
+        .video-wrapper iframe, .video-wrapper video { width: 100%; height: 100%; border: none; }
+
+        .lightbox-close {
+            position: absolute;
+            top: -45px;
+            right: 0;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+            line-height: 1;
+        }
+        .lightbox-close:hover { color: var(--primary-color); }
+
+        /* Visitor Mode */
+        body.visitor-mode #section-UNIQUE_ID .video-controls,
+        body.visitor-mode #section-UNIQUE_ID .card-actions,
+        body.visitor-mode #section-UNIQUE_ID .drag-handle,
+        body.visitor-mode #section-UNIQUE_ID .delete-section,
+        body.visitor-mode #section-UNIQUE_ID .section-title,
+        body.visitor-mode #section-UNIQUE_ID .video-modal {
+            display: none !important;
+        }
+        
+        body.visitor-mode #section-UNIQUE_ID .video-card {
+            cursor: pointer;
+        }
+        
+        /* در حالت ویزیتور عنوان ویدیو غیرقابل ویرایش شود */
+        body.visitor-mode #section-UNIQUE_ID .video-title {
+            pointer-events: none;
+        }
+    </style>
+
+    <script>
+        (function() {
+            const uid = 'UNIQUE_ID';
+            const grid = document.getElementById('video-grid-' + uid);
+            const addBtn = document.getElementById('add-video-btn-' + uid);
+            const modal = document.getElementById('modal-' + uid);
+            const saveBtn = document.getElementById('btn-save-' + uid);
+            const cancelBtn = document.getElementById('btn-cancel-' + uid);
+            
+            const urlInput = document.getElementById('video-url-input-' + uid);
+            const coverBox = document.getElementById('cover-upload-box-' + uid);
+            const coverInput = document.getElementById('cover-input-' + uid);
+            const coverPreview = document.getElementById('cover-preview-' + uid);
+            const hintText = document.getElementById('video-meta-hint-' + uid);
+            const spinner = document.getElementById('url-spinner-' + uid);
+            
+            // فیلدهای مخفی برای نگهداری داده‌های خودکار
+            const autoTitleInput = document.getElementById('auto-title-' + uid);
+            const autoCoverInput = document.getElementById('auto-cover-' + uid);
+
+            // لایت‌باکس
+            const lightbox = document.getElementById('lightbox-' + uid);
+            const lightboxClose = document.getElementById('lightbox-close-' + uid);
+            const lightboxContainer = document.getElementById('lightbox-video-container-' + uid);
+
+            let currentEditCard = null;
+
+            // --- مدیریت مودال و دریافت اطلاعات ---
+            if (addBtn) {
+                addBtn.addEventListener('click', () => {
+                    currentEditCard = null;
+                    resetModal();
+                    modal.classList.add('active');
+                });
+            }
+
+            const closeModal = () => modal.classList.remove('active');
+            cancelBtn.addEventListener('click', closeModal);
+
+            // گوش دادن به تغییر URL برای فچ کردن دیتا
+            let timeoutId;
+            urlInput.addEventListener('input', () => {
+                clearTimeout(timeoutId);
+                const url = urlInput.value.trim();
+                
+                if(!url) {
+                    hintText.textContent = 'لینک را وارد کنید.';
+                    hintText.style.color = 'inherit';
+                    return;
+                }
+
+                spinner.style.display = 'block';
+                hintText.textContent = 'در حال بررسی لینک...';
+                
+                timeoutId = setTimeout(() => {
+                    fetchVideoData(url);
+                }, 800);
+            });
+
+            async function fetchVideoData(url) {
+                let title = 'ویدیو جدید';
+                let thumbnail = '';
+                let success = false;
+
+                try {
+                    // 1. آپارات
+                    if (url.includes('aparat.com/v/')) {
+                        const id = url.split('/v/')[1].split('/')[0];
+                        const apiUrl = `https://www.aparat.com/etc/api/video/videohash/${id}`;
+                        
+                        try {
+                            const response = await fetch(apiUrl);
+                            const data = await response.json();
+                            if (data.video) {
+                                title = data.video.title;
+                                thumbnail = data.video.big_poster;
+                                success = true;
+                            }
+                        } catch(e) { console.log('Aparat fetch error', e); }
+                    } 
+                    // 2. یوتیوب
+                    else if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                        const noembedUrl = `https://noembed.com/embed?url=${url}`;
+                        try {
+                            const response = await fetch(noembedUrl);
+                            const data = await response.json();
+                            if (data.title) {
+                                title = data.title;
+                                thumbnail = data.thumbnail_url; 
+                                thumbnail = thumbnail.replace('hqdefault', 'maxresdefault');
+                                success = true;
+                            }
+                        } catch(e) { console.log('YouTube fetch error', e); }
+                    }
+                    // 3. فایل مستقیم (mp4)
+                    else if (url.match(/\.(mp4|webm)$/i)) {
+                        title = url.split('/').pop(); 
+                        try {
+                            thumbnail = await getVideoFrame(url);
+                            success = true;
+                        } catch(e) { console.log('Frame extract error', e); }
+                    }
+
+                    if (success) {
+                        hintText.textContent = `شناسایی شد: ${title}`;
+                        hintText.style.color = '#2ecc71';
+                        autoTitleInput.value = title;
+                        autoCoverInput.value = thumbnail;
+                        
+                        // نمایش پیش‌نمایش اگر دستی آپلود نشده باشد
+                        if (!coverInput.value && !coverPreview.src.startsWith('data:')) {
+                            coverPreview.src = thumbnail;
+                            coverPreview.style.display = 'block';
+                        }
+                    } else {
+                        hintText.textContent = 'اطلاعات خودکار یافت نشد. می‌توانید کاور دستی انتخاب کنید.';
+                        hintText.style.color = '#e74c3c';
+                    }
+
+                } catch (error) {
+                    hintText.textContent = 'خطا در ارتباط.';
+                } finally {
+                    spinner.style.display = 'none';
+                }
+            }
+
+            // تابع استخراج فریم از ویدیو
+            function getVideoFrame(videoUrl) {
+                return new Promise((resolve, reject) => {
+                    const video = document.createElement('video');
+                    video.src = videoUrl;
+                    video.crossOrigin = 'anonymous'; 
+                    video.currentTime = 1; 
+                    video.muted = true;
+                    
+                    video.onloadeddata = () => {};
+                    
+                    video.onseeked = () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        const dataUrl = canvas.toDataURL('image/jpeg');
+                        resolve(dataUrl);
+                    };
+                    
+                    video.onerror = reject;
+                });
+            }
+
+            // آپلود کاور دستی
+            coverBox.addEventListener('click', () => coverInput.click());
+            coverInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    if (typeof window.compressRegularImage === 'function') {
+                        window.compressRegularImage(file, (url) => {
+                            coverPreview.src = url;
+                            coverPreview.style.display = 'block';
+                            if (typeof window.storeUploadedFile === 'function') {
+                                window.storeUploadedFile('video-cover-' + Date.now(), file.name, url, file.type);
+                            }
+                        });
+                    } else {
+                        const reader = new FileReader();
+                        reader.onload = (ev) => {
+                            coverPreview.src = ev.target.result;
+                            coverPreview.style.display = 'block';
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                }
+            });
+
+            function resetModal() {
+                urlInput.value = '';
+                autoTitleInput.value = '';
+                autoCoverInput.value = '';
+                coverPreview.src = '';
+                coverPreview.style.display = 'none';
+                coverInput.value = '';
+                hintText.textContent = 'لینک را وارد کنید. عنوان و تصویر به صورت خودکار دریافت می‌شوند.';
+                hintText.style.color = 'inherit';
+            }
+
+            // --- ذخیره کارت ---
+            saveBtn.addEventListener('click', () => {
+                const url = urlInput.value.trim();
+                
+                // عنوان از دیتای خودکار (اگر بود) وگرنه پیش‌فرض
+                const autoTitle = autoTitleInput.value;
+                
+                // اولویت کاور: آپلود دستی > خودکار > پیش‌فرض
+                let cover = '';
+                if (coverInput.value || (coverPreview.src && coverPreview.src.startsWith('data:'))) {
+                    cover = coverPreview.src;
+                } else {
+                    cover = autoCoverInput.value || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><rect width="100%" height="100%" fill="%23333"/><text x="50%" y="50%" fill="%23777" dominant-baseline="middle" text-anchor="middle">No Cover</text></svg>';
+                }
+
+                if (currentEditCard) {
+                    updateCard(currentEditCard, autoTitle, url, cover);
+                } else {
+                    // برای کارت جدید، عنوان پیش‌فرض "نام ویدیو" یا عنوان خودکار است
+                    const finalTitle = autoTitle || 'نام ویدیو';
+                    createCard(finalTitle, url, cover);
+                }
+                closeModal();
+            });
+
+            function createCard(title, url, cover) {
+                const card = document.createElement('div');
+                card.className = 'video-card';
+                card.innerHTML = `
+                    <div class="video-thumbnail-box">
+                        <img src="${cover}" class="video-thumbnail" alt="${title}">
+                        <div class="play-icon"><i class="fas fa-play-circle"></i></div>
+                        <div class="card-actions">
+                            <button class="action-btn btn-edit" title="ویرایش لینک/کاور"><i class="fas fa-pen"></i></button>
+                            <button class="action-btn btn-delete" title="حذف"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h4 class="video-title" contenteditable="true">${title}</h4>
+                    </div>
+                `;
+                
+                card.setAttribute('data-url', url);
+                // تایتل در اتریبیوت فقط برای رفرنس است، اصل متن در contenteditable است
+                card.setAttribute('data-cover', cover);
+
+                // جلوگیری از پخش ویدیو هنگام کلیک روی عنوان برای ویرایش
+                const titleEl = card.querySelector('.video-title');
+                titleEl.addEventListener('click', (e) => e.stopPropagation());
+
+                grid.appendChild(card);
+                setupCardEvents(card);
+            }
+
+            function updateCard(card, autoTitle, url, cover) {
+                // فقط اگر عنوان جدیدی از لینک دریافت شده، متن را آپدیت کن
+                // در غیر این صورت به متنی که کاربر دستی ویرایش کرده دست نزن
+                if (autoTitle) {
+                    card.querySelector('.video-title').textContent = autoTitle;
+                }
+                
+                // آپدیت کاور همیشه انجام شود اگر تغییر کرده
+                if (cover && !cover.includes('No Cover')) {
+                    card.querySelector('.video-thumbnail').src = cover;
+                    card.setAttribute('data-cover', cover);
+                }
+                
+                card.setAttribute('data-url', url);
+            }
+
+            function setupCardEvents(card) {
+                const editBtn = card.querySelector('.btn-edit');
+                const deleteBtn = card.querySelector('.btn-delete');
+
+                editBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    currentEditCard = card;
+                    urlInput.value = card.getAttribute('data-url');
+                    
+                    // لود کردن کاور فعلی در مودال
+                    const currentCover = card.getAttribute('data-cover');
+                    if (currentCover) {
+                        coverPreview.src = currentCover;
+                        coverPreview.style.display = 'block';
+                    }
+                    
+                    hintText.textContent = 'برای تغییر ویدیو، لینک جدید وارد کنید.';
+                    modal.classList.add('active');
+                });
+
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if(confirm('آیا حذف شود؟')) card.remove();
+                });
+
+                card.addEventListener('click', () => {
+                    const videoUrl = card.getAttribute('data-url');
+                    playVideo(videoUrl);
+                });
+            }
+
+            // --- پخش ویدیو ---
+            function playVideo(url) {
+                if (!url) return;
+                
+                let embedHtml = '';
+
+                if (url.includes('aparat.com/v/')) {
+                    const id = url.split('/v/')[1].split('/')[0];
+                    embedHtml = `<iframe src="https://www.aparat.com/video/video/embed/videohash/${id}/vt/frame" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>`;
+                } 
+                else if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                    let id = '';
+                    if (url.includes('youtu.be/')) id = url.split('youtu.be/')[1];
+                    else id = url.split('v=')[1].split('&')[0];
+                    embedHtml = `<iframe src="https://www.youtube.com/embed/${id}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+                }
+                else if (url.match(/\.(mp4|webm)$/i)) {
+                    embedHtml = `<video controls autoplay><source src="${url}" type="video/mp4">مرورگر پشتیبانی نمی‌کند.</video>`;
+                }
+                else {
+                    embedHtml = `<iframe src="${url}" allowfullscreen></iframe>`;
+                }
+
+                lightboxContainer.innerHTML = embedHtml;
+                document.body.appendChild(lightbox);
+                lightbox.classList.add('active');
+            }
+
+            function closeLightbox() {
+                lightbox.classList.remove('active');
+                lightboxContainer.innerHTML = '';
+                setTimeout(() => {
+                    if(section && lightbox) section.appendChild(lightbox);
+                }, 300);
+            }
+
+            lightboxClose.addEventListener('click', closeLightbox);
+            lightbox.addEventListener('click', (e) => {
+                if (e.target === lightbox) closeLightbox();
+            });
+
+            grid.querySelectorAll('.video-card').forEach(setupCardEvents);
+
+        })();
+    </script>
+</section>

@@ -1,0 +1,58 @@
+<section class="section" id="section-UNIQUE_ID" data-section="about-us">
+    <div class="drag-handle">
+        <i class="fas fa-arrows-alt-v"></i>
+    </div>
+    
+    <div class="section-title">
+        <div class="section-title-text" contenteditable="true">درباره ما</div>
+        <div class="delete-section" onclick="deleteSection('section-UNIQUE_ID')">🗑️</div>
+    </div>
+    
+    <div class="section-content">
+        <div class="about-us-container">
+            <div class="about-us-image-container" 
+                 id="about-container-UNIQUE_ID"
+                 title="برای آپلود تصویر کلیک کنید"
+                 onclick="if(!document.body.classList.contains('visitor-mode')) document.getElementById('about-upload-UNIQUE_ID').click()">
+                
+                <img src="" alt="درباره ما" class="about-us-image" id="about-image-UNIQUE_ID" style="display: none;">
+                
+                <div class="about-us-image-placeholder" id="about-placeholder-UNIQUE_ID">
+                    <i class="fas fa-image"></i>
+                    <span>تصویر را آپلود کنید</span>
+                </div>
+
+                <input type="file" accept="image/*" class="about-us-image-upload" id="about-upload-UNIQUE_ID" style="display: none;"
+                       onchange="
+                           if(this.files[0]) {
+                               const file = this.files[0];
+                               // استفاده از توابع گلوبال موجود در فایل اصلی
+                               compressRegularImage(file, (url, name, type) => {
+                                   storeUploadedFile('about-img-UNIQUE_ID', name, url, type);
+                                   
+                                   const img = document.getElementById('about-image-UNIQUE_ID');
+                                   const ph = document.getElementById('about-placeholder-UNIQUE_ID');
+                                   
+                                   img.src = url;
+                                   img.style.display = 'block';
+                                   ph.style.display = 'none';
+                                   
+                                   showToast('تصویر با موفقیت بارگذاری شد');
+                               });
+                           }
+                           this.value = ''; 
+                       ">
+            </div>
+            
+            <div class="about-us-text-container" contenteditable="true">
+                <h3>تیتر توضیحات شما</h3>
+                <p>اینجا می‌توانید درباره کسب‌وکار خود بنویسید. این متن نمونه است و می‌توانید آن را ویرایش کنید.</p>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        #section-UNIQUE_ID .about-us-image[src=""] { display: none; }
+        #section-UNIQUE_ID .about-us-image[src] { display: block; }
+    </style>
+</section>

@@ -1,0 +1,570 @@
+<!-- 
+  =================================
+  ماژول: تماس و نقشه (Contact & Map)
+  =================================
+  شامل: 
+  - نقشه با قابلیت انتخاب مکان (کلیک و درگ)
+  - لیست‌های پویا برای تلفن و ایمیل
+  - کپی هوشمند با فیدبک "کپی شد"
+  - غیرقابل ویرایش بودن در خروجی
+-->
+<section class="section" id="section-UNIQUE_ID" data-section="contact-map">
+    <!-- هندل جابجایی -->
+    <div class="drag-handle">
+        <i class="fas fa-arrows-alt-v"></i>
+    </div>
+    
+    <!-- عنوان سکشن -->
+    <div class="section-title">
+        <div class="section-title-text" contenteditable="true">تماس با ما</div>
+        <div class="delete-section" onclick="deleteSection('section-UNIQUE_ID')">🗑️</div>
+    </div>
+    
+    <!-- محتوای اصلی -->
+    <div class="section-content">
+        <div class="contact-map-wrapper">
+            
+            <!-- بخش نقشه -->
+            <div class="map-container-box">
+                <div id="map-UNIQUE_ID" class="leaflet-map-component" data-lat="35.6892" data-lng="51.3890" data-zoom="13"></div>
+                <div class="map-overlay-hint">برای انتخاب موقعیت، روی نقشه کلیک کنید یا نشانگر را جابجا کنید</div>
+                <div class="map-visitor-overlay" title="برای مسیریابی کلیک کنید">
+                    <span class="nav-icon"><i class="fas fa-location-arrow"></i> مسیریابی</span>
+                </div>
+            </div>
+
+            <!-- بخش اطلاعات تماس -->
+            <div class="contact-info-box">
+                
+                <!-- آدرس -->
+                <div class="info-group address-group">
+                    <div class="group-header">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>آدرس</span>
+                    </div>
+                    <div class="editable-address" contenteditable="true" data-placeholder="آدرس دقیق خود را اینجا بنویسید...">آدرس دقیق خود را اینجا بنویسید...</div>
+                </div>
+
+                <!-- تلفن‌ها -->
+                <div class="info-group phones-group">
+                    <div class="group-header">
+                        <i class="fas fa-phone-alt"></i>
+                        <span>تلفن‌ها</span>
+                        <button class="btn-add-item" id="add-phone-UNIQUE_ID"><i class="fas fa-plus"></i></button>
+                    </div>
+                    <div class="items-list" id="phone-list-UNIQUE_ID">
+                        <!-- آیتم‌های تلفن -->
+                    </div>
+                </div>
+
+                <!-- ایمیل‌ها -->
+                <div class="info-group emails-group">
+                    <div class="group-header">
+                        <i class="fas fa-envelope"></i>
+                        <span>ایمیل‌ها</span>
+                        <button class="btn-add-item" id="add-email-UNIQUE_ID"><i class="fas fa-plus"></i></button>
+                    </div>
+                    <div class="items-list" id="email-list-UNIQUE_ID">
+                        <!-- آیتم‌های ایمیل -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <style>
+        #section-UNIQUE_ID .contact-map-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        /* نقشه */
+        #section-UNIQUE_ID .map-container-box {
+            flex: 1;
+            min-width: 300px;
+            height: 400px;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 1;
+        }
+
+        #section-UNIQUE_ID .leaflet-map-component {
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        #section-UNIQUE_ID .map-overlay-hint {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            z-index: 500; /* بالاتر از کنترل‌های نقشه */
+            pointer-events: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        #section-UNIQUE_ID .map-visitor-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        #section-UNIQUE_ID .map-visitor-overlay:hover {
+            opacity: 1;
+        }
+
+        #section-UNIQUE_ID .nav-icon {
+            background: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transform: translateY(10px);
+            transition: transform 0.3s;
+        }
+
+        #section-UNIQUE_ID .map-visitor-overlay:hover .nav-icon {
+            transform: translateY(0);
+        }
+
+        /* باکس اطلاعات */
+        #section-UNIQUE_ID .contact-info-box {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        #section-UNIQUE_ID .info-group {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 15px;
+            transition: all 0.3s;
+        }
+
+        #section-UNIQUE_ID .group-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 8px;
+        }
+
+        #section-UNIQUE_ID .btn-add-item {
+            margin-right: auto;
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            transition: background 0.2s;
+        }
+
+        #section-UNIQUE_ID .btn-add-item:hover {
+            background: var(--primary-color);
+        }
+
+        #section-UNIQUE_ID .editable-address {
+            min-height: 60px;
+            line-height: 1.6;
+            outline: none;
+            white-space: pre-wrap;
+        }
+
+        /* آیتم‌های لیست */
+        #section-UNIQUE_ID .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            background: rgba(0, 0, 0, 0.1);
+            padding: 8px;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        #section-UNIQUE_ID .item-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-family: inherit;
+            outline: none;
+            direction: ltr;
+            text-align: right;
+            font-size: 1rem;
+        }
+
+        /* استایل موفقیت کپی */
+        #section-UNIQUE_ID .item-input.copy-success {
+            color: #2ecc71 !important;
+            font-weight: bold;
+            text-align: center;
+            background: rgba(46, 204, 113, 0.1);
+            border-radius: 4px;
+        }
+
+        #section-UNIQUE_ID .btn-delete-item {
+            color: #ff6b6b;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            opacity: 0.7;
+            padding: 5px;
+        }
+
+        #section-UNIQUE_ID .btn-delete-item:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        /* --- VISITOR MODE STYLES --- */
+        
+        body.visitor-mode #section-UNIQUE_ID .btn-add-item,
+        body.visitor-mode #section-UNIQUE_ID .btn-delete-item,
+        body.visitor-mode #section-UNIQUE_ID .map-overlay-hint,
+        body.visitor-mode #section-UNIQUE_ID .drag-handle,
+        body.visitor-mode #section-UNIQUE_ID .delete-section,
+        body.visitor-mode #section-UNIQUE_ID .section-title {
+            display: none !important;
+        }
+
+        /* فعال کردن لایه کلیک نقشه برای مسیریابی */
+        body.visitor-mode #section-UNIQUE_ID .map-visitor-overlay {
+            display: flex;
+        }
+
+        /* غیرقابل ویرایش کردن آدرس */
+        body.visitor-mode #section-UNIQUE_ID .editable-address {
+            pointer-events: none; /* فقط متن باشد */
+        }
+
+        /* استایل اینپوت‌ها در خروجی (شبیه متن، قابل کلیک) */
+        body.visitor-mode #section-UNIQUE_ID .item-input {
+            cursor: pointer;
+            pointer-events: auto; /* فعال کردن کلیک برای کپی */
+            border-bottom: 1px dashed rgba(255,255,255,0.3); /* راهنمای بصری برای کلیک */
+        }
+        
+        body.visitor-mode #section-UNIQUE_ID .item-input:hover {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        body.visitor-mode #section-UNIQUE_ID .contact-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* مخفی کردن گروه‌های خالی */
+        body.visitor-mode #section-UNIQUE_ID .info-group.is-empty,
+        body.visitor-mode #section-UNIQUE_ID .contact-item.is-empty {
+            display: none !important;
+        }
+    </style>
+
+    <script>
+        (function() {
+            const uid = 'UNIQUE_ID';
+            const mapContainer = document.getElementById('map-' + uid);
+            const addressEl = document.querySelector('#section-' + uid + ' .editable-address');
+            const addPhoneBtn = document.getElementById('add-phone-' + uid);
+            const phoneList = document.getElementById('phone-list-' + uid);
+            const addEmailBtn = document.getElementById('add-email-' + uid);
+            const emailList = document.getElementById('email-list-' + uid);
+            const isVisitor = document.body.classList.contains('visitor-mode');
+            
+            // --- مدیریت نقشه (Leaflet) ---
+            let map, marker;
+            
+            function initMap() {
+                if (!L) return;
+
+                const lat = parseFloat(mapContainer.getAttribute('data-lat')) || 35.6892;
+                const lng = parseFloat(mapContainer.getAttribute('data-lng')) || 51.3890;
+                const zoom = parseInt(mapContainer.getAttribute('data-zoom')) || 13;
+
+                map = L.map(mapContainer).setView([lat, lng], zoom);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap'
+                }).addTo(map);
+
+                // ایجاد مارکر
+                marker = L.marker([lat, lng], {
+                    draggable: !isVisitor // فقط در ادمین قابل درگ است
+                }).addTo(map);
+
+                if (!isVisitor) {
+                    // رویداد جابجایی مارکر با درگ
+                    marker.on('dragend', function(e) {
+                        const position = marker.getLatLng();
+                        saveMapData(position.lat, position.lng, map.getZoom());
+                    });
+
+                    // رویداد کلیک روی نقشه برای جابجایی مارکر (Drop Pin)
+                    map.on('click', function(e) {
+                        marker.setLatLng(e.latlng);
+                        saveMapData(e.latlng.lat, e.latlng.lng, map.getZoom());
+                    });
+
+                    // رویداد زوم
+                    map.on('zoomend', function() {
+                        const position = marker.getLatLng();
+                        saveMapData(position.lat, position.lng, map.getZoom());
+                    });
+                } else {
+                    // در حالت بازدیدکننده، زوم و اسکرول نقشه را غیرفعال می‌کنیم تا با کلیک روی لایه مسیریابی تداخل نکند
+                    map.dragging.disable();
+                    map.touchZoom.disable();
+                    map.doubleClickZoom.disable();
+                    map.scrollWheelZoom.disable();
+                }
+
+                setTimeout(() => { map.invalidateSize(); }, 500);
+            }
+
+            function saveMapData(lat, lng, zoom) {
+                mapContainer.setAttribute('data-lat', lat);
+                mapContainer.setAttribute('data-lng', lng);
+                mapContainer.setAttribute('data-zoom', zoom);
+            }
+
+            // اجرای نقشه
+            // برای جلوگیری از مشکل لود نشدن تایل‌ها در مودال‌های مخفی یا تب‌ها، کمی تاخیر می‌دهیم
+            setTimeout(initMap, 100);
+
+            // رویداد کلیک برای مسیریابی (Visitor Mode)
+            const visitorOverlay = document.querySelector('#section-' + uid + ' .map-visitor-overlay');
+            if (visitorOverlay) {
+                visitorOverlay.addEventListener('click', () => {
+                    const lat = mapContainer.getAttribute('data-lat');
+                    const lng = mapContainer.getAttribute('data-lng');
+                    const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+                    window.open(url, '_blank');
+                });
+            }
+
+            // --- مدیریت لیست‌ها (تلفن و ایمیل) ---
+
+            function createItem(type, value = '') {
+                const item = document.createElement('div');
+                item.className = 'contact-item';
+                
+                const placeholder = type === 'phone' ? 'شماره تماس...' : 'ایمیل...';
+                const inputType = type === 'email' ? 'email' : 'tel';
+                
+                // در حالت ویزیتور، اینپوت را readonly می‌کنیم
+                const readOnlyAttr = isVisitor ? 'readonly' : '';
+                
+                item.innerHTML = `
+                    <input type="${inputType}" class="item-input" placeholder="${placeholder}" value="${value}" ${readOnlyAttr}>
+                    <button class="btn-delete-item" title="حذف">&times;</button>
+                `;
+
+                const input = item.querySelector('.item-input');
+                const deleteBtn = item.querySelector('.btn-delete-item');
+
+                // ذخیره مقدار برای HTML
+                input.addEventListener('input', () => {
+                    input.setAttribute('value', input.value);
+                    checkEmptyItem(item);
+                });
+
+                // حذف آیتم
+                deleteBtn.addEventListener('click', () => {
+                    item.remove();
+                    checkGroupVisibility();
+                });
+
+                // --- کپی هوشمند (Visitor Mode) ---
+                if (isVisitor) {
+                    input.addEventListener('click', (e) => {
+                        e.preventDefault(); // جلوگیری از فوکوس و تایپ
+                        
+                        // جلوگیری از تداخل اگر در حال نمایش پیام است
+                        if (input.dataset.copying === "true") return;
+
+                        const originalText = input.value;
+                        if (!originalText) return;
+
+                        const triggerFeedback = () => {
+                            input.dataset.copying = "true";
+                            input.value = "کپی شد"; // تغییر متن
+                            input.classList.add('copy-success');
+                            
+                            setTimeout(() => {
+                                input.value = originalText; // بازگشت متن اصلی
+                                input.classList.remove('copy-success');
+                                input.dataset.copying = "false";
+                            }, 2000); // 2 ثانیه
+                        };
+
+                        if (navigator.clipboard) {
+                            navigator.clipboard.writeText(originalText).then(triggerFeedback);
+                        } else {
+                            input.select();
+                            document.execCommand('copy');
+                            triggerFeedback();
+                            window.getSelection().removeAllRanges();
+                        }
+                    });
+                    
+                    // جلوگیری از تایپ (لایه امنیتی دوم)
+                    input.addEventListener('keydown', (e) => e.preventDefault());
+                }
+
+                return item;
+            }
+
+            // توابع کمکی بررسی خالی بودن
+            function checkEmptyItem(item) {
+                const val = item.querySelector('.item-input').value.trim();
+                if (!val) item.classList.add('is-empty');
+                else item.classList.remove('is-empty');
+                checkGroupVisibility();
+            }
+
+            function checkGroupVisibility() {
+                // آدرس
+                const addrGroup = addressEl.closest('.info-group');
+                const addrVal = addressEl.textContent.trim();
+                const addrPlace = addressEl.getAttribute('data-placeholder');
+                // بررسی اینکه آیا متن برابر پلیس‌هولدر است یا خالی
+                if (!addrVal || addrVal === addrPlace) addrGroup.classList.add('is-empty');
+                else addrGroup.classList.remove('is-empty');
+
+                // لیست‌ها
+                [phoneList, emailList].forEach(list => {
+                    const group = list.closest('.info-group');
+                    const hasVisibleItems = Array.from(list.children).some(item => !item.classList.contains('is-empty'));
+                    
+                    if (!hasVisibleItems && list.children.length > 0) {
+                        // اگر آیتم دارد ولی همه خالی هستند
+                        group.classList.add('is-empty');
+                    } else if (list.children.length === 0) {
+                        // اگر هیچ آیتمی ندارد
+                        group.classList.add('is-empty');
+                    } else {
+                        group.classList.remove('is-empty');
+                    }
+                });
+            }
+
+            // دکمه‌های افزودن (فقط ادمین)
+            if (addPhoneBtn) {
+                addPhoneBtn.addEventListener('click', () => {
+                    const item = createItem('phone');
+                    phoneList.appendChild(item);
+                    checkEmptyItem(item);
+                });
+            }
+
+            if (addEmailBtn) {
+                addEmailBtn.addEventListener('click', () => {
+                    const item = createItem('email');
+                    emailList.appendChild(item);
+                    checkEmptyItem(item);
+                });
+            }
+
+            // رویدادهای آدرس
+            addressEl.addEventListener('input', checkGroupVisibility);
+            addressEl.addEventListener('focus', function() {
+                if (this.textContent.trim() === this.getAttribute('data-placeholder')) this.textContent = '';
+            });
+            addressEl.addEventListener('blur', function() {
+                if (this.textContent.trim() === '') this.textContent = this.getAttribute('data-placeholder');
+                checkGroupVisibility();
+            });
+
+            // بازسازی لیست‌ها هنگام لود (Rehydration)
+            const rehydrateList = (list, type) => {
+                Array.from(list.children).forEach(item => {
+                    const input = item.querySelector('.item-input');
+                    const deleteBtn = item.querySelector('.btn-delete-item');
+                    
+                    // اتصال مجدد رویدادها
+                    input.addEventListener('input', () => {
+                        input.setAttribute('value', input.value);
+                        checkEmptyItem(item);
+                    });
+                    
+                    deleteBtn.addEventListener('click', () => {
+                        item.remove();
+                        checkGroupVisibility();
+                    });
+
+                    // منطق کپی (تکرار برای آیتم‌های موجود)
+                    if (isVisitor) {
+                        input.setAttribute('readonly', 'true'); // اطمینان از readonly بودن
+                        input.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            if (input.dataset.copying === "true") return;
+
+                            const originalText = input.value;
+                            if(!originalText) return;
+
+                            const triggerFeedback = () => {
+                                input.dataset.copying = "true";
+                                input.value = "کپی شد";
+                                input.classList.add('copy-success');
+                                setTimeout(() => {
+                                    input.value = originalText;
+                                    input.classList.remove('copy-success');
+                                    input.dataset.copying = "false";
+                                }, 2000);
+                            };
+
+                            if (navigator.clipboard) {
+                                navigator.clipboard.writeText(originalText).then(triggerFeedback);
+                            } else {
+                                input.select();
+                                document.execCommand('copy');
+                                triggerFeedback();
+                            }
+                        });
+                        input.addEventListener('keydown', (e) => e.preventDefault());
+                    }
+                    
+                    checkEmptyItem(item);
+                });
+            };
+
+            rehydrateList(phoneList, 'phone');
+            rehydrateList(emailList, 'email');
+            
+            // بررسی اولیه وضعیت نمایش
+            checkGroupVisibility();
+
+        })();
+    </script>
+</section>

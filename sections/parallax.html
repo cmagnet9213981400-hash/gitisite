@@ -1,0 +1,462 @@
+<!-- 
+  =================================
+  ماژول: پارالاکس (Parallax)
+  =================================
+  شامل: 
+  - ظاهر وسط‌چین شبیه اسلایدر
+  - کادر شیشه‌ای دور پارالاکس
+  - جزیره جابجایی غیرفعال (Disabled Drag Handle)
+-->
+<section class="section parallax-section-wrapper" id="section-UNIQUE_ID" data-section="parallax">
+    <!-- هندل جابجایی (غیرفعال شده) -->
+    <div class="drag-handle disabled-handle" title="جابجایی این بخش غیرفعال است">
+        <i class="fas fa-arrows-alt-v"></i>
+    </div>
+    
+    <!-- نوار عنوان سکشن (مخصوص ادمین) -->
+    <div class="section-title">
+        <div class="section-title-text" contenteditable="true" data-placeholder="عنوان سکشن">عنوان پارالاکس</div>
+        <div class="section-tools" style="display: flex; gap: 10px; align-items: center;">
+            <button class="btn-change-bg-mini" id="btn-bg-UNIQUE_ID" title="تغییر تصویر زمینه">
+                <i class="fas fa-image"></i>
+            </button>
+            <div class="delete-section" onclick="deleteSection('section-UNIQUE_ID')">🗑️</div>
+        </div>
+        <input type="file" accept="image/*" id="bg-upload-UNIQUE_ID" style="display: none;">
+    </div>
+
+    <!-- بدنه اصلی سکشن -->
+    <div class="section-content-wrapper">
+        <!-- کادر شیشه‌ای وسط‌چین (شبیه اسلایدر) -->
+        <div class="parallax-box">
+            <!-- تصویر پس‌زمینه -->
+            <div class="parallax-bg" id="parallax-bg-UNIQUE_ID"></div>
+            
+            <!-- لایه تاریک‌کننده -->
+            <div class="parallax-overlay"></div>
+
+            <!-- محتوای متنی و دکمه -->
+            <div class="parallax-content">
+                <h2 contenteditable="true" class="parallax-headline">تیتر جذاب پارالاکس</h2>
+                <p contenteditable="true" class="parallax-text">متن توضیحات خود را اینجا بنویسید.</p>
+                <a href="#" class="parallax-btn" id="main-btn-UNIQUE_ID" data-link-type="external" data-link-value="#">دکمه اقدام</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال تنظیمات دکمه (داخل سکشن) -->
+    <div class="btn-settings-modal" id="modal-UNIQUE_ID">
+        <div class="btn-settings-content">
+            <h3>تنظیمات دکمه</h3>
+            <div class="form-group">
+                <label>عنوان دکمه:</label>
+                <input type="text" id="btn-text-input-UNIQUE_ID" class="settings-input">
+            </div>
+            <div class="form-group">
+                <label>نوع لینک:</label>
+                <select id="link-type-select-UNIQUE_ID" class="settings-input">
+                    <option value="section">لنگر به بخش‌های صفحه (Section)</option>
+                    <option value="internal">صفحات داخلی سایت</option>
+                    <option value="external">لینک خارجی (External)</option>
+                </select>
+            </div>
+            <div class="form-group" id="link-value-container-UNIQUE_ID">
+                <label>مقصد لینک:</label>
+                <input type="text" class="settings-input" placeholder="انتخاب کنید...">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-save" id="btn-save-UNIQUE_ID">ذخیره</button>
+                <button class="btn-cancel" id="btn-cancel-UNIQUE_ID">لغو</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* نگهدارنده اصلی سکشن */
+        #section-UNIQUE_ID {
+            position: relative;
+            background: transparent; /* پس‌زمینه اصلی سکشن شفاف */
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 0; 
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: var(--section-spacing);
+            min-height: auto;
+            /* استایل شیشه‌ای کلی (اختیاری، چون کادر داخلی هم دارد) */
+            background: var(--glass-bg); 
+            backdrop-filter: blur(12px);
+        }
+
+        /* هندل غیرفعال */
+        #section-UNIQUE_ID .drag-handle.disabled-handle {
+            opacity: 0.3;
+            cursor: not-allowed !important;
+            pointer-events: none; /* کلید اصلی غیرفعال کردن */
+            background: #555; /* رنگ تیره برای نشان دادن غیرفعال بودن */
+        }
+
+        /* نوار عنوان ادمین */
+        #section-UNIQUE_ID .section-title {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 10;
+        }
+
+        #section-UNIQUE_ID .section-title-text {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            cursor: text;
+            outline: none;
+        }
+
+        /* رپر محتوا برای فاصله دادن */
+        #section-UNIQUE_ID .section-content-wrapper {
+            padding: 30px; /* فاصله از لبه‌های سکشن */
+            display: flex;
+            justify-content: center;
+        }
+
+        /* کادر پارالاکس (شبیه کادر اسلایدر) */
+        #section-UNIQUE_ID .parallax-box {
+            position: relative;
+            width: 100%;
+            /* ابعاد و استایل شبیه ماژول اسلایدر */
+            height: 400px; 
+            border-radius: 15px;
+            overflow: hidden;
+            background: #000; /* رنگ پایه زیر عکس */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border: 1px solid var(--glass-border);
+        }
+
+        /* تصویر پس‌زمینه */
+        #section-UNIQUE_ID .parallax-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><rect width="100%" height="100%" fill="%23555"/></svg>');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover; 
+            background-attachment: scroll; 
+            z-index: 0;
+        }
+
+        /* لایه تاریک */
+        #section-UNIQUE_ID .parallax-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        /* محتوا */
+        #section-UNIQUE_ID .parallax-content {
+            position: relative;
+            z-index: 2;
+            max-width: 80%;
+            width: 100%;
+            color: #ffffff;
+            padding: 20px;
+        }
+
+        #section-UNIQUE_ID .parallax-headline {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.7);
+            outline: none;
+        }
+
+        #section-UNIQUE_ID .parallax-text {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.7);
+            outline: none;
+        }
+
+        /* دکمه اقدام */
+        #section-UNIQUE_ID .parallax-btn {
+            display: inline-block;
+            padding: 12px 35px;
+            background-color: var(--button-color);
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        #section-UNIQUE_ID .parallax-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        /* دکمه تغییر عکس کوچک */
+        #section-UNIQUE_ID .btn-change-bg-mini {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: var(--text-color);
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        #section-UNIQUE_ID .btn-change-bg-mini:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* استایل مودال */
+        #section-UNIQUE_ID .btn-settings-modal {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 50;
+            justify-content: center;
+            align-items: center;
+            text-align: right;
+            direction: rtl;
+            backdrop-filter: blur(5px);
+            border-radius: 20px;
+        }
+        
+        #section-UNIQUE_ID .btn-settings-modal.active {
+            display: flex;
+        }
+
+        #section-UNIQUE_ID .btn-settings-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            padding: 25px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            color: var(--text-color);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+        }
+
+        #section-UNIQUE_ID .btn-settings-content h3 {
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 10px;
+        }
+
+        #section-UNIQUE_ID .form-group { margin-bottom: 15px; }
+        #section-UNIQUE_ID .form-group label { display: block; margin-bottom: 5px; font-size: 0.9rem; }
+        
+        #section-UNIQUE_ID .settings-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            outline: none;
+        }
+        
+        #section-UNIQUE_ID .settings-input:focus {
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        #section-UNIQUE_ID .settings-input option {
+            background: #333; color: #fff;
+        }
+
+        #section-UNIQUE_ID .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+
+        #section-UNIQUE_ID .btn-save {
+            background: var(--button-color);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        #section-UNIQUE_ID .btn-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            border: 1px solid var(--glass-border);
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* --- VISITOR MODE STYLES --- */
+        /* حذف کادر، بردر و نوار عنوان در خروجی */
+        body.visitor-mode #section-UNIQUE_ID {
+            background: transparent !important;
+            border: none !important;
+            border-radius: 0 !important;
+            margin-bottom: 0 !important;
+            padding: 0 !important;
+            backdrop-filter: none !important;
+        }
+
+        /* مخفی کردن نوار عنوان و ابزارهای ادمین */
+        body.visitor-mode #section-UNIQUE_ID .section-title,
+        body.visitor-mode #section-UNIQUE_ID .drag-handle,
+        body.visitor-mode #section-UNIQUE_ID .delete-section,
+        body.visitor-mode #section-UNIQUE_ID .btn-settings-modal {
+            display: none !important;
+        }
+
+        /* تنظیم فاصله در خروجی */
+        body.visitor-mode #section-UNIQUE_ID .section-content-wrapper {
+            padding: 0 !important; /* حذف پدینگ کادر ادمین */
+        }
+        
+        body.visitor-mode #section-UNIQUE_ID .parallax-box {
+            border-radius: 0 !important; /* تمام عرض شدن در خروجی */
+            border: none !important;
+            box-shadow: none !important;
+        }
+    </style>
+
+    <script>
+        (function() {
+            const uid = 'UNIQUE_ID';
+            const section = document.getElementById('section-' + uid);
+            const bgDiv = document.getElementById('parallax-bg-' + uid);
+            const bgBtn = document.getElementById('btn-bg-' + uid);
+            const bgInput = document.getElementById('bg-upload-' + uid);
+            const mainBtn = document.getElementById('main-btn-' + uid);
+            const modal = document.getElementById('modal-' + uid);
+            const btnTextInput = document.getElementById('btn-text-input-' + uid);
+            const linkTypeSelect = document.getElementById('link-type-select-' + uid);
+            const linkValueContainer = document.getElementById('link-value-container-' + uid);
+            const btnSave = document.getElementById('btn-save-' + uid);
+            const btnCancel = document.getElementById('btn-cancel-' + uid);
+
+            // آپلود عکس
+            if (bgBtn) bgBtn.addEventListener('click', () => bgInput.click());
+            if (bgInput) {
+                bgInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        if (typeof window.compressRegularImage === 'function') {
+                            window.compressRegularImage(file, (url) => {
+                                bgDiv.style.backgroundImage = `url('${url}')`;
+                                if (typeof window.storeUploadedFile === 'function') {
+                                    window.storeUploadedFile('parallax-bg-' + Date.now(), file.name, url, file.type);
+                                }
+                            });
+                        } else {
+                            const reader = new FileReader();
+                            reader.onload = (ev) => bgDiv.style.backgroundImage = `url('${ev.target.result}')`;
+                            reader.readAsDataURL(file);
+                        }
+                    }
+                });
+            }
+
+            // مودال
+            mainBtn.addEventListener('click', (e) => {
+                if (document.body.classList.contains('visitor-mode')) return; 
+                e.preventDefault();
+                
+                // پر کردن مقادیر
+                btnTextInput.value = mainBtn.textContent;
+                linkTypeSelect.value = mainBtn.getAttribute('data-link-type') || 'external';
+                updateLinkValueField();
+                
+                const valueInput = linkValueContainer.querySelector('.settings-input');
+                if (valueInput) {
+                    valueInput.value = mainBtn.getAttribute('data-link-value') || '';
+                }
+                
+                modal.classList.add('active');
+            });
+
+            const closeModal = () => modal.classList.remove('active');
+            btnCancel.addEventListener('click', closeModal);
+
+            linkTypeSelect.addEventListener('change', updateLinkValueField);
+
+            function updateLinkValueField() {
+                const type = linkTypeSelect.value;
+                let html = '<label>مقصد لینک:</label>';
+
+                if (type === 'section') {
+                    const sections = document.querySelectorAll('section[id^="section-"]');
+                    html += '<select id="link-value-input-' + uid + '" class="settings-input">';
+                    if (sections.length === 0) html += '<option value="">بخشی یافت نشد</option>';
+                    else {
+                        sections.forEach(sec => {
+                            const titleEl = sec.querySelector('.section-title-text');
+                            const name = titleEl ? titleEl.textContent : 'بخش بدون نام';
+                            const currentVal = mainBtn.getAttribute('data-link-value');
+                            const selected = currentVal === ('#' + sec.id) ? 'selected' : '';
+                            html += `<option value="#${sec.id}" ${selected}>${name} (${sec.dataset.section})</option>`;
+                        });
+                    }
+                    html += '</select>';
+                } else if (type === 'internal') {
+                    html += '<select id="link-value-input-' + uid + '" class="settings-input">';
+                    html += '<option value="index.html">صفحه اصلی (Home)</option>';
+                    html += '</select>';
+                } else {
+                    html += `<input type="text" id="link-value-input-${uid}" class="settings-input" placeholder="https://example.com" dir="ltr">`;
+                }
+                linkValueContainer.innerHTML = html;
+            }
+
+            btnSave.addEventListener('click', () => {
+                const newText = btnTextInput.value;
+                const newType = linkTypeSelect.value;
+                const valueInput = document.getElementById('link-value-input-' + uid);
+                let newValue = valueInput ? valueInput.value : '#';
+
+                if (newType === 'external' && newValue && !newValue.startsWith('#')) {
+                    if (!newValue.match(/^https?:\/\//i)) newValue = 'https://' + newValue;
+                }
+
+                mainBtn.textContent = newText;
+                mainBtn.setAttribute('href', newValue);
+                mainBtn.setAttribute('data-link-type', newType);
+                mainBtn.setAttribute('data-link-value', newValue);
+                
+                if (newType === 'external') mainBtn.setAttribute('target', '_blank');
+                else mainBtn.removeAttribute('target');
+
+                closeModal();
+            });
+        })();
+    </script>
+</section>

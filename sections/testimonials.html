@@ -1,0 +1,440 @@
+<!-- 
+  =================================
+  ماژول: نظرات مشتریان (Testimonials)
+  =================================
+  شامل: اسلایدر خودکار، فشرده‌سازی تصویر و مدیریت کارت‌ها
+-->
+<section class="section" id="section-UNIQUE_ID" data-section="testimonials">
+    <!-- هندل جابجایی و حذف -->
+    <div class="drag-handle">
+        <i class="fas fa-arrows-alt-v"></i>
+    </div>
+    
+    <!-- عنوان سکشن -->
+    <div class="section-title">
+        <div class="section-title-text" contenteditable="true">نظرات مشتریان</div>
+        <div class="delete-section" onclick="deleteSection('section-UNIQUE_ID')">🗑️</div>
+    </div>
+    
+    <!-- محتوای اصلی سکشن -->
+    <div class="section-content">
+        <div class="testimonial-wrapper" id="t-wrapper-UNIQUE_ID">
+            
+            <!-- دکمه ناوبری قبلی -->
+            <button class="t-nav-btn t-prev" id="t-prev-UNIQUE_ID">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+
+            <!-- کانتینر اسلایدر -->
+            <div class="t-slider-container">
+                <div class="t-slider-track" id="t-track-UNIQUE_ID">
+                    <!-- کارت پیش‌فرض ۱ -->
+                    <div class="t-card">
+                        <div class="t-card-inner">
+                            <div class="t-img-container" title="برای تغییر تصویر کلیک کنید">
+                                <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23eee'/><circle cx='50' cy='40' r='20' fill='%23ccc'/><path d='M20 90 Q50 60 80 90' stroke='%23ccc' stroke-width='2' fill='none'/></svg>" class="t-img">
+                                <div class="t-img-overlay"><i class="fas fa-camera"></i></div>
+                                <input type="file" accept="image/*" class="t-file-input" style="display: none;">
+                            </div>
+                            <h3 contenteditable="true">نام مشتری</h3>
+                            <p contenteditable="true">نظر ارزشمند مشتری درباره خدمات یا محصولات شما در اینجا قرار می‌گیرد. این متن نمونه است.</p>
+                            <button class="t-delete-btn" title="حذف این نظر">&times;</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- دکمه ناوبری بعدی -->
+            <button class="t-nav-btn t-next" id="t-next-UNIQUE_ID">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+        </div>
+
+        <!-- دکمه افزودن کارت جدید -->
+        <div class="t-controls">
+            <button class="t-add-btn" id="t-add-UNIQUE_ID">
+                <i class="fas fa-plus"></i> افزودن نظر جدید
+            </button>
+        </div>
+    </div>
+
+    <!-- استایل‌های اختصاصی این ماژول -->
+    <style>
+        #section-UNIQUE_ID .testimonial-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            padding: 10px 0;
+        }
+
+        #section-UNIQUE_ID .t-slider-container {
+            flex: 1;
+            overflow: hidden;
+            border-radius: 15px;
+            /* جهت اطمینان از نمایش صحیح سایه‌ها */
+            padding: 10px 5px; 
+        }
+
+        #section-UNIQUE_ID .t-slider-track {
+            display: flex;
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            width: 100%;
+        }
+
+        #section-UNIQUE_ID .t-card {
+            min-width: 100%; /* در موبایل هر کارت ۱۰۰٪ عرض را می‌گیرد */
+            padding: 0 10px;
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
+
+        /* در دسکتاپ (مثلاً ۳ کارت در صفحه) */
+        @media (min-width: 768px) {
+            #section-UNIQUE_ID .t-card {
+                min-width: 33.333%;
+            }
+        }
+
+        #section-UNIQUE_ID .t-card-inner {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 25px 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        #section-UNIQUE_ID .t-card-inner:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-5px);
+        }
+
+        #section-UNIQUE_ID .t-img-container {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-bottom: 15px;
+            border: 2px solid var(--primary-color);
+            position: relative;
+            cursor: pointer;
+            background: #fff;
+        }
+
+        #section-UNIQUE_ID .t-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #section-UNIQUE_ID .t-img-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex; justify-content: center; align-items: center;
+            color: white;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #section-UNIQUE_ID .t-img-container:hover .t-img-overlay {
+            opacity: 1;
+        }
+
+        #section-UNIQUE_ID h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            font-weight: bold;
+            width: 100%;
+            outline: none;
+        }
+
+        #section-UNIQUE_ID p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            line-height: 1.6;
+            width: 100%;
+            outline: none;
+        }
+
+        #section-UNIQUE_ID .t-nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            color: var(--text-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+
+        #section-UNIQUE_ID .t-nav-btn:hover {
+            background: var(--primary-color);
+            transform: scale(1.1);
+        }
+
+        #section-UNIQUE_ID .t-delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 0, 0, 0.1);
+            color: #ff6b6b;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #section-UNIQUE_ID .t-card-inner:hover .t-delete-btn {
+            opacity: 1;
+        }
+
+        #section-UNIQUE_ID .t-controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        #section-UNIQUE_ID .t-add-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        #section-UNIQUE_ID .t-add-btn:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+    </style>
+
+    <!-- منطق جاوااسکریپت اختصاصی ماژول -->
+    <script>
+        (function() {
+            const uid = 'UNIQUE_ID';
+            const section = document.getElementById('section-' + uid);
+            const track = document.getElementById('t-track-' + uid);
+            const prevBtn = document.getElementById('t-prev-' + uid);
+            const nextBtn = document.getElementById('t-next-' + uid);
+            const addBtn = document.getElementById('t-add-' + uid);
+            
+            let currentIndex = 0;
+            let autoSlideInterval;
+            const SLIDE_DELAY = 10000; // 10 ثانیه
+
+            // --- توابع اسلایدر ---
+
+            function getVisibleItems() {
+                // محاسبه تعداد آیتم‌های قابل مشاهده بر اساس عرض کانتینر
+                const containerWidth = track.parentElement.offsetWidth;
+                const cardWidth = track.firstElementChild ? track.firstElementChild.offsetWidth : containerWidth;
+                return Math.max(1, Math.round(containerWidth / cardWidth));
+            }
+
+            function updateSlider() {
+                const totalItems = track.children.length;
+                const visibleItems = getVisibleItems();
+                const maxIndex = Math.max(0, totalItems - visibleItems);
+
+                // مدیریت چرخش اسلایدر
+                if (currentIndex > maxIndex) currentIndex = 0;
+                if (currentIndex < 0) currentIndex = maxIndex;
+
+                // محاسبه درصد حرکت
+                // در حالت RTL، حرکت به سمت راست (مثبت) یا چپ (منفی) بستگی به پیاده‌سازی مرورگر دارد.
+                // روش مطمئن: استفاده از درصد نسبی بر اساس ایندکس و تعداد آیتم‌های نمایشی
+                const itemWidthPercent = 100 / visibleItems;
+                const translateVal = currentIndex * itemWidthPercent;
+                
+                // تشخیص جهت صفحه
+                const isRTL = document.documentElement.dir === 'rtl';
+                // معمولا translateX منفی آیتم‌ها را به چپ می‌برد (نمایش آیتم‌های بعدی در LTR)
+                // در RTL نیز اغلب اسلایدرها همین منطق را دارند مگر اینکه جهت flex معکوس باشد
+                const direction = isRTL ? 1 : -1; 
+                
+                track.style.transform = `translateX(${direction * translateVal}%)`;
+            }
+
+            function nextSlide() {
+                currentIndex++;
+                updateSlider();
+            }
+
+            function prevSlide() {
+                currentIndex--;
+                updateSlider();
+            }
+
+            function startAutoPlay() {
+                stopAutoPlay();
+                autoSlideInterval = setInterval(nextSlide, SLIDE_DELAY);
+            }
+
+            function stopAutoPlay() {
+                if (autoSlideInterval) clearInterval(autoSlideInterval);
+            }
+
+            // ذخیره اینتروال در المنت سکشن برای پاکسازی هنگام حذف سکشن توسط سیستم اصلی
+            section.sliderInterval = autoSlideInterval;
+
+            // --- رویدادهای کنترلی ---
+
+            nextBtn.addEventListener('click', () => {
+                nextSlide();
+                startAutoPlay(); // ریست تایمر
+            });
+
+            prevBtn.addEventListener('click', () => {
+                prevSlide();
+                startAutoPlay();
+            });
+
+            addBtn.addEventListener('click', () => {
+                const newCard = document.createElement('div');
+                newCard.className = 't-card';
+                newCard.innerHTML = `
+                    <div class="t-card-inner">
+                        <div class="t-img-container" title="برای تغییر تصویر کلیک کنید">
+                            <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23eee'/><circle cx='50' cy='40' r='20' fill='%23ccc'/><path d='M20 90 Q50 60 80 90' stroke='%23ccc' stroke-width='2' fill='none'/></svg>" class="t-img">
+                            <div class="t-img-overlay"><i class="fas fa-camera"></i></div>
+                            <input type="file" accept="image/*" class="t-file-input" style="display: none;">
+                        </div>
+                        <h3 contenteditable="true">مشتری جدید</h3>
+                        <p contenteditable="true">متن نظر خود را اینجا بنویسید...</p>
+                        <button class="t-delete-btn" title="حذف">&times;</button>
+                    </div>
+                `;
+                track.appendChild(newCard);
+                setupCardEvents(newCard);
+                updateSlider();
+            });
+
+            // تنظیم رویداد برای تغییر سایز صفحه (ریسپانسیو)
+            window.addEventListener('resize', updateSlider);
+
+            // --- توابع کارت و تصاویر ---
+
+            function setupCardEvents(card) {
+                const imgContainer = card.querySelector('.t-img-container');
+                const fileInput = card.querySelector('.t-file-input');
+                const imgElement = card.querySelector('.t-img');
+                const deleteBtn = card.querySelector('.t-delete-btn');
+
+                // توقف اسلایدر هنگام هاور روی کارت (برای خواندن راحت‌تر)
+                card.addEventListener('mouseenter', stopAutoPlay);
+                card.addEventListener('mouseleave', startAutoPlay);
+
+                // آپلود عکس
+                imgContainer.addEventListener('click', (e) => {
+                    fileInput.click();
+                });
+
+                fileInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        // فشرده سازی بین ۵۰ تا ۱۰۰ کیلوبایت
+                        compressImageSmart(file, 50, 100, (finalUrl) => {
+                            imgElement.src = finalUrl;
+                            
+                            // ذخیره در فایل‌های پروژه (اگر تابع گلوبال موجود باشد)
+                            if (typeof window.storeUploadedFile === 'function') {
+                                window.storeUploadedFile('testimonial-' + Date.now(), file.name, finalUrl, file.type);
+                            }
+                        });
+                    }
+                    e.target.value = '';
+                });
+
+                // حذف کارت
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // جلوگیری از تریگر شدن درگ سکشن
+                    if (track.children.length > 1) {
+                        card.remove();
+                        updateSlider();
+                    } else {
+                        // اگر سیستم نوتیفیکیشن دارد
+                        if (typeof showToast === 'function') showToast('حداقل یک نظر باید باقی بماند.');
+                        else alert('حداقل یک نظر باید باقی بماند.');
+                    }
+                });
+            }
+
+            /**
+             * تابع فشرده‌سازی هوشمند تصاویر
+             * هدف: رسیدن به حجم بین minKB و maxKB
+             */
+            function compressImageSmart(file, minKB, maxKB, callback) {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        // ریسایز اولیه اگر خیلی بزرگ باشد (مثلاً بزرگتر از ۸۰۰ پیکسل برای تصاویر کوچک نظرات)
+                        const MAX_DIM = 800;
+                        if (width > MAX_DIM || height > MAX_DIM) {
+                            if (width > height) {
+                                height = Math.round((height * MAX_DIM) / width);
+                                width = MAX_DIM;
+                            } else {
+                                width = Math.round((width * MAX_DIM) / height);
+                                height = MAX_DIM;
+                            }
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        // شروع لوپ کاهش کیفیت
+                        let quality = 0.9;
+                        let dataUrl = canvas.toDataURL('image/jpeg', quality);
+                        // تخمین حجم: طول رشته base64 * 0.75 تقسیم بر 1024
+                        let sizeKB = dataUrl.length * 0.75 / 1024;
+
+                        // تا زمانی که حجم بیشتر از maxKB است و کیفیت معقول است، کم کن
+                        while (sizeKB > maxKB && quality > 0.1) {
+                            quality -= 0.05;
+                            dataUrl = canvas.toDataURL('image/jpeg', quality);
+                            sizeKB = dataUrl.length * 0.75 / 1024;
+                        }
+
+                        callback(dataUrl);
+                    };
+                };
+            }
+
+            // راه‌اندازی اولیه برای کارت‌های موجود
+            section.querySelectorAll('.t-card').forEach(setupCardEvents);
+            
+            // شروع اسلایدر
+            startAutoPlay();
+
+        })();
+    </script>
+</section>

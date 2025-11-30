@@ -1,0 +1,425 @@
+<!-- 
+  =================================
+  ماژول: مشتریان ما (Clients / Partners)
+  =================================
+  شامل: 
+  - اسلایدر لوگوی مشتریان با قابلیت چرخش بی‌پایان (Infinite Loop)
+  - نمایش رنگی تصاویر در خروجی
+  - فشرده‌سازی تا ۵۰ کیلوبایت
+  - مخفی‌سازی کامل کادرها در خروجی
+-->
+<section class="section" id="section-UNIQUE_ID" data-section="clients">
+    <!-- هندل جابجایی -->
+    <div class="drag-handle">
+        <i class="fas fa-arrows-alt-v"></i>
+    </div>
+    
+    <!-- عنوان سکشن (مخصوص ادمین) -->
+    <div class="section-title">
+        <div class="section-title-text" contenteditable="true">مشتریان ما</div>
+        <div class="delete-section" onclick="deleteSection('section-UNIQUE_ID')">🗑️</div>
+    </div>
+    
+    <!-- محتوای اصلی -->
+    <div class="section-content">
+        <p class="clients-desc" contenteditable="true">افتخار همکاری با برندهای معتبر</p>
+        
+        <div class="clients-wrapper">
+            <!-- دکمه ناوبری راست -->
+            <button class="clients-nav next" id="next-btn-UNIQUE_ID"><i class="fas fa-chevron-right"></i></button>
+            
+            <div class="clients-slider-container" id="slider-container-UNIQUE_ID">
+                <div class="clients-track" id="track-UNIQUE_ID">
+                    <!-- کارت نمونه -->
+                    <div class="client-card">
+                        <div class="client-logo-wrapper" title="تغییر لوگو">
+                            <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50' y='50' text-anchor='middle' dominant-baseline='middle' fill='%23aaa' font-size='14'>LOGO</text></svg>" class="client-img" alt="Client Logo">
+                            <div class="upload-overlay"><i class="fas fa-camera"></i></div>
+                            <input type="file" accept="image/*" class="client-file-input" style="display: none;">
+                        </div>
+                        <h4 contenteditable="true" class="client-name">نام مشتری</h4>
+                        <button class="btn-delete-client" title="حذف">&times;</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- دکمه ناوبری چپ -->
+            <button class="clients-nav prev" id="prev-btn-UNIQUE_ID"><i class="fas fa-chevron-left"></i></button>
+        </div>
+
+        <!-- دکمه افزودن (مخصوص ادمین) -->
+        <div class="clients-controls">
+            <button class="btn-add-client" id="add-client-UNIQUE_ID">
+                <i class="fas fa-plus-circle"></i> افزودن مشتری جدید
+            </button>
+        </div>
+    </div>
+
+    <style>
+        #section-UNIQUE_ID .clients-desc {
+            text-align: center;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        #section-UNIQUE_ID .clients-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #section-UNIQUE_ID .clients-slider-container {
+            width: 100%;
+            overflow: hidden; 
+            position: relative;
+            padding: 10px 0;
+            /* ماسک محو شدن در لبه‌ها */
+            mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+        }
+
+        #section-UNIQUE_ID .clients-track {
+            display: flex;
+            gap: 30px;
+            padding: 10px 20px;
+            /* حذف ترنزیشن پیش‌فرض برای کنترل دقیق با JS */
+            width: max-content;
+            align-items: center;
+        }
+
+        #section-UNIQUE_ID .client-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 15px;
+            width: 140px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        #section-UNIQUE_ID .client-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        #section-UNIQUE_ID .client-logo-wrapper {
+            width: 90px;
+            height: 90px;
+            background: transparent; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 10px;
+            position: relative;
+            cursor: pointer;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); 
+        }
+
+        #section-UNIQUE_ID .client-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        #section-UNIQUE_ID .upload-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex; align-items: center; justify-content: center;
+            color: white;
+            opacity: 0;
+            transition: opacity 0.3s;
+            border-radius: 50%;
+        }
+
+        #section-UNIQUE_ID .client-logo-wrapper:hover .upload-overlay {
+            opacity: 1;
+        }
+
+        #section-UNIQUE_ID .client-name {
+            font-size: 0.9rem;
+            text-align: center;
+            margin: 0;
+            width: 100%;
+            outline: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #section-UNIQUE_ID .btn-delete-client {
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+
+        #section-UNIQUE_ID .client-card:hover .btn-delete-client {
+            opacity: 1;
+            top: 5px;
+            left: 5px;
+        }
+
+        #section-UNIQUE_ID .clients-controls {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #section-UNIQUE_ID .btn-add-client {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+
+        #section-UNIQUE_ID .btn-add-client:hover {
+            background: var(--primary-color);
+        }
+
+        #section-UNIQUE_ID .clients-nav {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            border: 1px solid var(--glass-border);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 5;
+            flex-shrink: 0;
+        }
+
+        #section-UNIQUE_ID .clients-nav:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* --- Visitor Mode Styles --- */
+        
+        body.visitor-mode #section-UNIQUE_ID .section-title,
+        body.visitor-mode #section-UNIQUE_ID .drag-handle,
+        body.visitor-mode #section-UNIQUE_ID .delete-section,
+        body.visitor-mode #section-UNIQUE_ID .btn-delete-client,
+        body.visitor-mode #section-UNIQUE_ID .clients-controls,
+        body.visitor-mode #section-UNIQUE_ID .upload-overlay {
+            display: none !important;
+        }
+
+        body.visitor-mode #section-UNIQUE_ID {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+
+        body.visitor-mode #section-UNIQUE_ID .client-card {
+            pointer-events: none;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        
+        /* نمایش رنگی در خروجی (فیلترهای سیاه و سفید حذف شدند) */
+        body.visitor-mode #section-UNIQUE_ID .client-logo-wrapper {
+            pointer-events: none;
+            filter: none; /* اطمینان از رنگی بودن */
+            opacity: 1;
+        }
+    </style>
+
+    <script>
+        (function() {
+            const uid = 'UNIQUE_ID';
+            const container = document.getElementById('slider-container-' + uid);
+            const track = document.getElementById('track-' + uid);
+            const addBtn = document.getElementById('add-client-' + uid);
+            const nextBtn = document.getElementById('next-btn-' + uid);
+            const prevBtn = document.getElementById('prev-btn-' + uid);
+            
+            let autoScrollInterval;
+            const SCROLL_DELAY = 5000;
+            let isAnimating = false;
+
+            // --- توابع مدیریتی ---
+
+            if (addBtn) {
+                addBtn.addEventListener('click', () => {
+                    addClientCard();
+                });
+            }
+
+            function addClientCard() {
+                const card = document.createElement('div');
+                card.className = 'client-card';
+                card.innerHTML = `
+                    <div class="client-logo-wrapper" title="تغییر لوگو">
+                        <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50' y='50' text-anchor='middle' dominant-baseline='middle' fill='%23aaa' font-size='14'>LOGO</text></svg>" class="client-img" alt="Client Logo">
+                        <div class="upload-overlay"><i class="fas fa-camera"></i></div>
+                        <input type="file" accept="image/*" class="client-file-input" style="display: none;">
+                    </div>
+                    <h4 contenteditable="true" class="client-name">نام مشتری</h4>
+                    <button class="btn-delete-client" title="حذف">&times;</button>
+                `;
+                track.appendChild(card);
+                setupCardEvents(card);
+                
+                const fileInput = card.querySelector('.client-file-input');
+                setTimeout(() => fileInput.click(), 100);
+            }
+
+            function setupCardEvents(card) {
+                const logoWrapper = card.querySelector('.client-logo-wrapper');
+                const fileInput = card.querySelector('.client-file-input');
+                const img = card.querySelector('.client-img');
+                const deleteBtn = card.querySelector('.btn-delete-client');
+
+                logoWrapper.addEventListener('click', () => fileInput.click());
+                
+                fileInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        if (typeof window.compressImageWithSizeControl === 'function') {
+                            window.compressImageWithSizeControl(file, { 
+                                maxSize: 300, 
+                                quality: 0.8, 
+                                maxFileSize: 50 * 1024 
+                            }, (url) => {
+                                img.src = url;
+                                if (typeof window.storeUploadedFile === 'function') {
+                                    window.storeUploadedFile('client-logo-' + Date.now(), file.name, url, file.type);
+                                }
+                            });
+                        } else {
+                            const reader = new FileReader();
+                            reader.onload = (ev) => img.src = ev.target.result;
+                            reader.readAsDataURL(file);
+                        }
+                    }
+                    e.target.value = '';
+                });
+
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if(confirm('آیا این مشتری حذف شود؟')) card.remove();
+                });
+                
+                card.addEventListener('mouseenter', stopAutoScroll);
+                card.addEventListener('mouseleave', startAutoScroll);
+            }
+
+            // --- منطق اسلایدر بی‌پایان (DOM Loop) ---
+
+            function startAutoScroll() {
+                stopAutoScroll();
+                autoScrollInterval = setInterval(() => slide('next'), SCROLL_DELAY);
+            }
+
+            function stopAutoScroll() {
+                if (autoScrollInterval) clearInterval(autoScrollInterval);
+            }
+
+            function slide(direction) {
+                if (isAnimating || track.children.length < 2) return;
+                isAnimating = true;
+
+                const firstCard = track.firstElementChild;
+                const lastCard = track.lastElementChild;
+                const gap = 30; // فاصله بین کارت‌ها در CSS
+                const cardWidth = firstCard.offsetWidth + gap;
+                const isRTL = document.documentElement.dir === 'rtl';
+
+                // در RTL جهت‌ها معکوس است: 
+                // برای Next (رفتن به آیتم بعدی)، باید ترک به راست برود (مثبت)
+                // برای Prev (رفتن به آیتم قبلی)، باید ترک به چپ برود (منفی)
+                
+                // در LTR:
+                // Next -> translateX(-cardWidth)
+                // Prev -> translateX(cardWidth)
+
+                let translateVal;
+                if (isRTL) {
+                    translateVal = (direction === 'next') ? cardWidth : -cardWidth;
+                } else {
+                    translateVal = (direction === 'next') ? -cardWidth : cardWidth;
+                }
+
+                if (direction === 'next') {
+                    // حرکت به جلو
+                    track.style.transition = 'transform 0.5s ease-in-out';
+                    track.style.transform = `translateX(${translateVal}px)`;
+
+                    setTimeout(() => {
+                        track.style.transition = 'none';
+                        track.appendChild(firstCard); // انتقال اولی به آخر
+                        track.style.transform = 'translateX(0)';
+                        isAnimating = false;
+                    }, 500);
+
+                } else {
+                    // حرکت به عقب
+                    // برای حرکت نرم به عقب، ابتدا آخری را به اول می‌آوریم و آفست می‌دهیم
+                    // سپس با انیمیشن به صفر برمی‌گردیم
+                    
+                    track.style.transition = 'none';
+                    track.insertBefore(lastCard, firstCard); // انتقال آخری به اول
+                    
+                    // آفست اولیه (برعکس حرکت)
+                    track.style.transform = `translateX(${-translateVal}px)`;
+                    
+                    // اجبار به رندر (Reflow)
+                    void track.offsetWidth;
+
+                    track.style.transition = 'transform 0.5s ease-in-out';
+                    track.style.transform = 'translateX(0)';
+
+                    setTimeout(() => {
+                        isAnimating = false;
+                    }, 500);
+                }
+            }
+
+            nextBtn.addEventListener('click', () => {
+                slide('next');
+                startAutoScroll();
+            });
+
+            prevBtn.addEventListener('click', () => {
+                slide('prev');
+                startAutoScroll();
+            });
+
+            // راه‌اندازی اولیه
+            track.querySelectorAll('.client-card').forEach(setupCardEvents);
+            startAutoScroll();
+
+        })();
+    </script>
+</section>

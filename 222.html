@@ -1,0 +1,2312 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سایت ساز حرفه ای گروه هنری گیتی نسخه 1.5.1 (Mandatory Page Name)</title>
+    <link rel="icon" type="image/x-icon" id="dynamicFavicon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏢</text></svg>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --button-color: #e74c3c;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-color: #ffffff;
+            --dark-text: #333333;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.1);
+            --section-spacing: 50px;
+            --max-content-width: 1200px;
+            --text-align: right;
+            --float-direction: right;
+            --flex-direction: row;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: var(--text-align);
+        }
+
+        body.is-dragging .section * {
+            pointer-events: none !important;
+        }
+
+        #background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+        #background-container video,
+        #background-container iframe,
+        #background-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .fixed-nav {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            z-index: 999;
+            padding: 10px 20px;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 8px 32px var(--shadow-color);
+            max-width: 90%;
+            gap: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            order: 1;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .nav-logo:hover {
+            transform: scale(1.1);
+        }
+        
+        [dir="ltr"] .nav-logo {
+            order: 0;
+        }
+        
+        .nav-logo img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+        
+        .nav-container {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 5px 0;
+        }
+        
+        .nav-item {
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: var(--text-color);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .nav-item.active {
+            background: var(--primary-color);
+        }
+
+        .fixed-nav .vcard-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            padding: 0;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 10px;
+            display: none;
+        }
+        .vcard-btn.show {
+            display: block;
+        }
+
+        .fixed-nav .vcard-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .cms-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .cms-toggle:hover {
+            transform: scale(1.1);
+        }
+        
+        .cms-controls {
+            position: fixed;
+            top: 0;
+            right: -350px;
+            bottom: 0;
+            width: 350px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 20px;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+            border-left: 1px solid var(--glass-border);
+            overflow-y: auto;
+            transition: right 0.4s ease;
+            direction: ltr;
+        }
+        .cms-controls-inner {
+            direction: rtl;
+        }
+        
+        .cms-controls.active {
+            right: 0;
+        }
+        
+        .cms-section {
+            padding: 15px;
+            background: var(--glass-bg);
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            margin-bottom: 20px;
+        }
+        
+        .cms-section h3 {
+            margin: -15px -15px 15px -15px;
+            padding: 15px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            color: var(--text-color);
+            cursor: pointer;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px 12px 0 0;
+            justify-content: space-between;
+        }
+        .cms-section h3 .toggle-icon {
+            transition: transform 0.3s ease;
+        }
+        .cms-section.open h3 .toggle-icon {
+            transform: rotate(45deg);
+        }
+        
+        .cms-section h3 .title-content i {
+            margin-left: 10px;
+        }
+        
+        [dir="ltr"] .cms-section h3 .title-content i {
+            margin-left: 0;
+            margin-right: 10px;
+        }
+
+        .cms-controls-container {
+            display: none;
+            padding-top: 10px;
+        }
+
+        .cms-section.open .cms-controls-container {
+            display: block;
+        }
+        
+        .cms-control {
+            margin-bottom: 15px;
+        }
+        
+        .cms-control input, .cms-control select, .cms-control textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+        }
+        
+        .cms-control button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: var(--button-color);
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .cms-control button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .color-picker {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .alignment-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .alignment-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .alignment-btn.active {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: var(--primary-color);
+        }
+        
+        /* استایل لیست صفحات در تنظیمات */
+        .pages-list {
+            list-style: none;
+            padding: 0;
+        }
+        .page-list-item {
+            background: rgba(255,255,255,0.05);
+            margin-bottom: 8px;
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .page-list-item.active {
+            border: 1px solid var(--primary-color);
+            background: rgba(255,255,255,0.1);
+        }
+        .page-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .page-name { font-weight: bold; }
+        .page-actions { display: flex; gap: 5px; }
+        .btn-icon-small {
+            padding: 5px;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        .page-edit-row {
+            display: none;
+            gap: 5px;
+        }
+        .page-edit-row.show { display: flex; }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            gap: var(--section-spacing);
+            width: 100%;
+            max-width: var(--max-content-width);
+            transition: margin-right 0.4s ease;
+            margin-top: 100px;
+        }
+        
+        .main-container.cms-open {
+            margin-right: 350px;
+        }
+
+        .add-section-main {
+            width: 100%;
+            max-width: var(--max-content-width);
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            border: 2px dashed var(--glass-border);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 200px;
+            margin-top: 20px;
+        }
+        
+        .add-section-main:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+        }
+        
+        .add-section-content {
+            text-align: center;
+        }
+        
+        .add-section-content i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+        
+        .add-section-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .add-section-content p {
+            opacity: 0.8;
+        }
+        
+        .section-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .section-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+        
+        .section-modal-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 25px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80%;
+            overflow-y: auto;
+            border: 1px solid var(--glass-border);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        
+        .section-modal.active .section-modal-content {
+            transform: scale(1);
+        }
+        
+        .section-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        .section-modal-close {
+            font-size: 24px;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .section-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .section-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .section-option:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+        }
+        
+        .section-option i {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .hero-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px var(--shadow-color);
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            cursor: default; 
+            scroll-margin-top: 120px;
+        }
+        
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            opacity: 0.2;
+            transition: opacity 0.5s ease;
+        }
+        
+        .hero-content {
+            width: 100%;
+            max-width: 800px;
+            z-index: 2;
+            text-align: var(--text-align);
+        }
+
+        .hero-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        [dir="ltr"] .hero-controls {
+            right: auto;
+            left: 20px;
+            align-items: flex-start;
+        }
+        .hero-controls .cms-only-button {
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            gap: 8px;
+        }
+        .hero-controls .opacity-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 10px;
+            border-radius: 8px;
+        }
+         .hero-controls .opacity-control input[type="range"] {
+            width: 100px;
+         }
+        
+        .business-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo-container {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 25px;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        [dir="ltr"] .logo-container {
+            margin-left: 0;
+            margin-right: 25px;
+        }
+        
+        .logo-container:hover {
+            transform: scale(1.05);
+        }
+        
+        .logo-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+        
+        .logo-upload-text {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 3px;
+            font-size: 10px;
+            text-align: center;
+            display: none;
+        }
+        
+        .logo-container:hover .logo-upload-text {
+            display: block;
+        }
+        
+        .business-text h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .business-text p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+        }
+        
+        .section {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            padding: 30px;
+            position: relative;
+            /* cursor: move; */ /* Only handle is draggable */
+            transition: all 0.3s ease, box-shadow 0.3s ease;
+            scroll-margin-top: 120px;
+        }
+        
+        .section.dragging {
+            opacity: 0.5;
+            transform: scale(0.98);
+        }
+        
+        /* استایل جدید برای دراپ تارگت */
+        .section.drop-target {
+            background: rgba(0, 0, 0, 0.6) !important;
+            border: 2px dashed var(--primary-color) !important;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            transition: background 0.2s ease;
+        }
+        
+        .section.highlighted-by-nav {
+            background: rgba(0, 0, 0, 0.3);
+            transition: background 0.3s ease;
+        }
+        
+        .drag-handle {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--secondary-color);
+            color: var(--primary-color);
+            width: 60px;
+            height: 30px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+        
+        .drag-handle:hover {
+            background: var(--primary-color);
+            color: var(--secondary-color);
+            transform: translateX(-50%) scale(1.1);
+        }
+        
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        body.visitor-mode .drag-handle {
+            display: none !important;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-direction: var(--flex-direction);
+        }
+        
+        .section-title-text {
+            flex: 1;
+            cursor: text;
+        }
+        
+        .delete-section {
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            color: #ff6b6b;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            order: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            transition: all 0.3s ease;
+            width: 38px;
+            height: 38px;
+            line-height: 1;
+        }
+        
+        .delete-section:hover {
+            background: rgba(255, 0, 0, 0.3);
+            transform: scale(1.05);
+        }
+        
+        /* Styles for New Page Modal */
+        .page-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2001;
+            justify-content: center;
+            align-items: center;
+        }
+        .page-modal.active { display: flex; }
+        .page-modal-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+            color: var(--text-color);
+        }
+        .page-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .page-option {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        .page-option:hover:not(.disabled) {
+            background: var(--primary-color);
+            transform: translateY(-5px);
+        }
+        .page-option.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+        .page-option i { font-size: 2.5rem; }
+
+        footer {
+            margin-top: 50px;
+            padding: 30px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            text-align: center;
+            width: 100%;
+        }
+        
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .footer-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .footer-logo img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+        .footer-text {
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .footer-social {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .footer-social a {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+        
+        .footer-social a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+        
+        .copyright {
+            font-size: 14px;
+            opacity: 0.8;
+            padding-top: 20px;
+            border-top: 1px solid var(--glass-border);
+        }
+        
+        .gitiarts-signature {
+            position: relative;
+            margin-top: 20px;
+        }
+        
+        .gitiarts-link {
+            font-size: 12px;
+            opacity: 0.6;
+            text-decoration: none;
+            color: inherit;
+            transition: opacity 0.3s ease;
+        }
+        
+        .gitiarts-link:hover {
+            opacity: 1;
+        }
+        
+        .gitiarts-card {
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            width: 200px;
+        }
+        
+        .gitiarts-link:hover .gitiarts-card {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .gitiarts-card img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+        
+        .gitiarts-card-text span {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .gitiarts-card-text small {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            z-index: 10000;
+            opacity: 0;
+            transform: translateY(100px);
+            transition: all 0.3s ease;
+        }
+        
+        [dir="ltr"] .toast {
+            left: auto;
+            right: 20px;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .hamburger-menu-btn {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: var(--primary-color);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-menu-btn.active {
+            transform: rotate(90deg);
+        }
+
+        .mobile-nav-menu {
+            position: fixed;
+            top: 100px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid var(--glass-border);
+            padding: 15px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-50px);
+            transition: all 0.3s ease;
+        }
+
+        .mobile-nav-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .mobile-nav-menu .nav-item {
+            display: block;
+            width: 100%;
+            text-align: right;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .cms-controls {
+                width: 100%;
+                right: -100%;
+            }
+            .cms-controls.active {
+                right: 0;
+            }
+            .main-container.cms-open {
+                margin-right: 0;
+            }
+            .cms-toggle {
+                left: auto;
+                right: 20px;
+            }
+            .business-info {
+                flex-direction: column;
+                text-align: center;
+            }
+            .logo-container {
+                margin: 0 0 20px 0;
+            }
+            .fixed-nav {
+                display: none;
+            }
+            .hamburger-menu-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                left: 20px;
+                top: 20px;
+            }
+            .fixed-nav .vcard-btn {
+                display: block;
+                order: 2;
+                margin-left: auto;
+            }
+            .fixed-nav .nav-logo {
+                display: none;
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .section {
+            animation: fadeInUp 0.5s ease;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        @media print {
+            body * {
+                display: none !important;
+            }
+            body::after {
+                content: "Printing is disabled for this page.";
+                display: block !important;
+                text-align: center;
+                font-size: 2rem;
+                color: black !important;
+                background: white !important;
+                padding: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="background-container"></div>
+    <div class="fixed-nav" id="fixedNav">
+        <div class="nav-logo" id="mainNavLogo">
+            <img id="navLogo" src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏢</text></svg>" alt="لوگو">
+        </div>
+        <div class="nav-container" id="navContainer">
+            </div>
+        <button class="vcard-btn" id="headerVCardBtn" style="display: none;"><i class="fas fa-address-card"></i></button>
+    </div>
+    
+    <div class="cms-toggle" id="cmsToggle">
+        <i class="fas fa-cog"></i>
+    </div>
+    
+    <div class="cms-controls" id="cmsControls">
+        <div class="cms-controls-inner">
+            <div class="cms-section open">
+                <h3><span class="title-content"><i class="fas fa-palette"></i> تنظیمات ظاهری</span> <span class="toggle-icon"><i class="fas fa-plus"></i></span></h3>
+                <div class="cms-controls-container">
+                    <div class="cms-control">
+                        <label>رنگ اصلی</label>
+                        <div class="color-picker">
+                            <input type="color" id="primaryColor" value="#3498db">
+                            <input type="text" id="primaryColorText" value="#3498db">
+                        </div>
+                    </div>
+                    <div class="cms-control">
+                        <label>رنگ ثانویه</label>
+                        <div class="color-picker">
+                            <input type="color" id="secondaryColor" value="#2c3e50">
+                            <input type="text" id="secondaryColorText" value="#2c3e50">
+                        </div>
+                    </div>
+                    <div class="cms-control">
+                        <label>رنگ دکمه‌ها</label>
+                        <div class="color-picker">
+                            <input type="color" id="buttonColor" value="#e74c3c">
+                            <input type="text" id="buttonColorText" value="#e74c3c">
+                        </div>
+                    </div>
+                    <div class="cms-control">
+                        <label>رنگ متن</label>
+                        <div class="color-picker">
+                            <input type="color" id="textColor" value="#ffffff">
+                            <input type="text" id="textColorText" value="#ffffff">
+                        </div>
+                    </div>
+                    <div class="cms-control">
+                        <label>تراز متن</label>
+                        <div class="alignment-controls">
+                            <div class="alignment-btn active" data-align="right">راست‌چین</div>
+                            <div class="alignment-btn" data-align="left">چپ‌چین</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="cms-section">
+                <h3><span class="title-content"><i class="fas fa-image"></i> پس‌زمینه پیشرفته</span> <span class="toggle-icon"><i class="fas fa-plus"></i></span></h3>
+                <div class="cms-controls-container">
+                    <div class="cms-control">
+                        <label>نوع پس‌زمینه کلی</label>
+                        <select id="globalBgType">
+                            <option value="gradient">گرادینت رنگ</option>
+                            <option value="image">تصویر</option>
+                            <option value="video">ویدیو</option>
+                            <option value="animation">کد انیمیشن</option>
+                        </select>
+                    </div>
+
+                    <div id="bg-type-gradient" class="bg-type-settings">
+                        <p style="font-size: 12px; opacity: 0.8; margin-bottom: 10px;">از رنگ‌های اصلی و ثانویه در تنظیمات ظاهری استفاده می‌شود.</p>
+                    </div>
+
+                    <div id="bg-type-image" class="bg-type-settings" style="display:none;">
+                         <div class="cms-control">
+                            <button class="cms-only-button" style="width:100%;" onclick="document.getElementById('globalBgImageUpload').click()">انتخاب تصویر</button>
+                        </div>
+                    </div>
+                    
+                    <div id="bg-type-video" class="bg-type-settings" style="display:none;">
+                        <div class="cms-control">
+                            <label>ویدیو پس‌زمینه (محلی)</label>
+                            <button class="cms-only-button" style="width:100%;" onclick="document.getElementById('globalBgVideoUpload').click()">انتخاب ویدیو</button>
+                        </div>
+                        <div class="cms-control">
+                            <label>لینک ویدیو پس‌زمینه (YouTube)</label>
+                            <input type="url" id="globalBgVideoUrl" placeholder="https://www.youtube.com/watch?v=...">
+                        </div>
+                    </div>
+
+                    <div id="bg-type-animation" class="bg-type-settings" style="display:none;">
+                         <div class="cms-control">
+                            <label>CSS سفارشی</label>
+                            <textarea id="customCss" rows="4" placeholder="body { font-size: 16px; }"></textarea>
+                        </div>
+                    </div>
+
+                    <div id="bg-opacity-control" class="cms-control" style="display:none;">
+                        <label>میزان شفافیت (Opacity)</label>
+                        <input type="range" id="globalBgOpacity" min="0" max="1" step="0.05" value="1" style="width: 100%;">
+                    </div>
+
+                    <hr style="border-color: var(--glass-border); margin: 15px 0;">
+                    
+                    <div class="cms-control">
+                        <label>JavaScript سفارشی</label>
+                        <textarea id="customJs" rows="4" placeholder="alert('Welcome!');"></textarea>
+                    </div>
+                    <div class="cms-control">
+                        <button id="applyAdvancedSettings">اعمال تنظیمات</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="cms-section">
+                <h3><span class="title-content"><i class="fas fa-bullhorn"></i> سئو و متا</span> <span class="toggle-icon"><i class="fas fa-plus"></i></span></h3>
+                <div class="cms-controls-container">
+                    <div class="cms-control">
+                        <label>توضیحات متا (Description)</label>
+                        <textarea id="metaDescription" rows="3" placeholder="یک توضیح کوتاه و جذاب برای موتورهای جستجو"></textarea>
+                    </div>
+                    <div class="cms-control">
+                        <label>کلمات کلیدی / هشتگ‌ها (Keywords)</label>
+                        <textarea id="metaKeywords" rows="2" placeholder="کلمات را با کاما (,) جدا کنید"></textarea>
+                    </div>
+                    <div class="cms-control">
+                        <label>اسکیما (JSON-LD Schema)</label>
+                        <textarea id="schemaData" rows="5" placeholder="کد اسکیمای خود را اینجا قرار دهید"></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="cms-section">
+                <h3><span class="title-content"><i class="fas fa-file-alt"></i> صفحات</span> <span class="toggle-icon"><i class="fas fa-plus"></i></span></h3>
+                <div class="cms-controls-container">
+                    <div class="cms-control">
+                        <button id="btnOpenPageModal">ایجاد صفحه جدید</button>
+                    </div>
+                    <hr style="border-color: var(--glass-border); margin: 15px 0;">
+                    <div class="pages-list-container">
+                        <h4>لیست صفحات:</h4>
+                        <ul class="pages-list" id="cmsPagesList">
+                            <!-- Pages will be listed here -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cms-section">
+                <h3><span class="title-content"><i class="fas fa-download"></i> ذخیره و بارگذاری</span> <span class="toggle-icon"><i class="fas fa-plus"></i></span></h3>
+                <div class="cms-controls-container">
+                    <div class="cms-control">
+                        <button id="saveProjectZip">خروجی نهایی (فایل .zip)</button>
+                    </div>
+                    <div class="cms-control">
+                        <input type="file" id="loadData" accept=".json" style="display:none;">
+                        <button id="importData">بارگذاری پروژه (فایل .json)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="main-container" id="mainContainer">
+        <section class="hero-section" id="section-hero" data-section="hero">
+            <img class="hero-bg" id="heroBg" src="" alt="پس‌زمینه">
+            <div class="hero-content">
+                <div class="business-info">
+                    <div class="logo-container" id="logoContainer">
+                        <img id="businessLogo" src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏢</text></svg>" alt="لوگوی کسب‌وکار">
+                        <div class="logo-upload-text">برای تغییر لوگو کلیک کنید</div>
+                    </div>
+                    <div class="business-text">
+                        <h1 contenteditable="true" class="editable" id="businessName">نام کسب‌وکار شما</h1>
+                        <p contenteditable="true" class="editable" id="businessTagline">توضیح کوتاه درباره کسب‌وکار شما</p>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-controls">
+                <button class="cms-only-button" onclick="document.getElementById('heroBgUpload').click()"><i class="fas fa-image"></i> تغییر پس‌زمینه</button>
+                <div class="opacity-control">
+                    <label for="heroBgOpacity"><i class="fas fa-eye"></i></label>
+                    <input type="range" id="heroBgOpacity" min="0" max="1" step="0.05" value="0.2">
+                </div>
+                 <button class="cms-only-button" onclick="removeHeroBg()"><i class="fas fa-trash"></i></button>
+            </div>
+        </section>
+        
+        <div class="add-section-main" id="addSectionMain">
+            <div class="add-section-content">
+                <i class="fas fa-plus-circle"></i>
+                <h3>افزودن بخش جدید</h3>
+                <p>برای افزودن بخش جدید به سایت کلیک کنید</p>
+            </div>
+        </div>
+        </div>
+
+    <button class="hamburger-menu-btn" id="hamburgerMenuBtn">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="mobile-nav-menu" id="mobileNavMenu">
+        <div class="nav-container-mobile" id="navContainerMobile">
+            </div>
+    </div>
+    
+    <div class="section-modal" id="sectionModal">
+        <div class="section-modal-content">
+            <div class="section-modal-header">
+                <h2>افزودن بخش جدید</h2>
+                <div class="section-modal-close" id="sectionModalClose">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+            <div class="section-options" id="sectionOptionsContainer">
+                <div class="section-option" data-type="empty">
+                    <i class="fas fa-plus"></i>
+                    <span>سکشن خالی</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for New Page Selection -->
+    <div class="page-modal" id="pageModal">
+        <div class="page-modal-content">
+            <h3>انتخاب نوع صفحه جدید</h3>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display:block; margin-bottom:5px; font-weight:bold;">نام صفحه:</label>
+                <input type="text" id="newPageNameInput" class="cms-control" style="width:100%; padding:10px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:white; border-radius:5px;" placeholder="مثلاً: تماس با ما">
+            </div>
+
+            <div class="page-options">
+                <div class="page-option" id="btnPageEmpty">
+                    <i class="far fa-file"></i>
+                    <span>صفحه خالی</span>
+                </div>
+                <div class="page-option disabled">
+                    <i class="fas fa-newspaper"></i>
+                    <span>مقالات (به زودی)</span>
+                </div>
+                <div class="page-option disabled">
+                    <i class="fas fa-store"></i>
+                    <span>فروشگاه (به زودی)</span>
+                </div>
+            </div>
+            <button class="btn-cancel" id="btnClosePageModal" style="width: auto; padding: 10px 30px;">لغو</button>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img id="footerLogo" src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏢</text></svg>" alt="لوگو">
+            </div>
+            <div class="footer-text" contenteditable="true" id="footerText">
+                توضیحات کوتاهی در مورد کسب‌وکار یا وبسایت شما. این متن قابل ویرایش است.
+            </div>
+            <div class="footer-social" id="footerSocial">
+                </div>
+            <div class="copyright" id="copyrightText" contenteditable="true">
+                کلیه حقوق این وبسایت برای نام کسب‌وکار شما محفوظ است.
+            </div>
+            <div class="gitiarts-signature">
+                <a href="https://www.gitiarts.ir" target="_blank" class="gitiarts-link">
+                    طراحی شده توسط www.gitiarts.ir
+                    <div class="gitiarts-card">
+                        <img src="https://gitiarts.ir/favicon.ico" alt="Gitiarts Logo">
+                        <div class="gitiarts-card-text">
+                            <span>گروه هنری گیتی‌آرتس</span>
+                            <small>gitiarts.ir</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <div class="toast" id="toast"></div>
+    
+    <input type="file" id="logoUpload" accept="image/*" style="display: none;">
+    <input type="file" id="heroBgUpload" accept="image/*" style="display: none;">
+    <input type="file" id="globalBgImageUpload" accept="image/*" style="display: none;">
+    <input type="file" id="globalBgVideoUpload" accept="video/mp4,video/webm" style="display:none;">
+
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script id="cms-script">
+        /**
+         * =========================================
+         * MODULAR SECTION REGISTRY
+         * =========================================
+         * برای اضافه کردن سکشن‌های جدید، کافیست لاجیک آن‌ها را اینجا تعریف کنید.
+         */
+        const SectionRegistry = {
+            'empty': {
+                init: (sectionElement) => {
+                    // سکشن خالی نیاز به لاجیک خاصی ندارد
+                }
+            }
+            // نکته: لاجیک 'about-us' حذف شد زیرا اکنون در خود فایل about-us.html قرار دارد
+        };
+
+
+        // تنظیمات فشرده‌سازی تصاویر
+        const COMPRESSION_SETTINGS = {
+            logo: { maxSize: 200, quality: 0.9 },
+            favicon: { maxSize: 40, quality: 0.8 },
+            navlogo: { maxSize: 100, quality: 0.9 },
+            regular: { maxSize: 1920, quality: 0.8, maxFileSize: 300 * 1024 },
+            gallery: { maxSize: 1920, quality: 0.8, maxFileSize: 300 * 1024 }
+        };
+
+        // --- PAGE MANAGEMENT STATE ---
+        let pages = [
+            { id: 'home', title: 'صفحه اصلی', slug: 'index', sections: [] }
+        ];
+        let currentPageId = 'home';
+
+        // متغیرهای گلوبال
+        let uploadedFiles = { images: [], videos: [] };
+        let availableSections = []; // مانیفست سکشن‌ها
+        let hiddenNavItems = [];
+        let globalBackgroundVideoFile = null;
+        let currentSectionType = '';
+        const isCMSMode = document.getElementById('cmsToggle') !== null;
+
+        // انتخابگرهای DOM
+        const cmsToggle = document.getElementById('cmsToggle');
+        const cmsControls = document.getElementById('cmsControls');
+        const mainContainer = document.getElementById('mainContainer');
+        const addSectionMain = document.getElementById('addSectionMain');
+        const sectionModal = document.getElementById('sectionModal');
+        const sectionModalClose = document.getElementById('sectionModalClose');
+        const sectionOptionsContainer = document.getElementById('sectionOptionsContainer');
+        const logoUpload = document.getElementById('logoUpload');
+        const heroBgUpload = document.getElementById('heroBgUpload');
+        const logoContainer = document.getElementById('logoContainer');
+        const businessLogo = document.getElementById('businessLogo');
+        const heroBg = document.getElementById('heroBg');
+        const navLogo = document.getElementById('navLogo');
+        const footerLogo = document.getElementById('footerLogo');
+        const navContainer = document.getElementById('navContainer');
+        const dynamicFavicon = document.getElementById('dynamicFavicon');
+        const toast = document.getElementById('toast');
+        const hamburgerMenuBtn = document.getElementById('hamburgerMenuBtn');
+        const mobileNavMenu = document.getElementById('mobileNavMenu');
+        const navContainerMobile = document.getElementById('navContainerMobile');
+        const heroBgOpacitySlider = document.getElementById('heroBgOpacity');
+        
+        // Page Modal Elements
+        const pageModal = document.getElementById('pageModal');
+        const btnOpenPageModal = document.getElementById('btnOpenPageModal');
+        const btnClosePageModal = document.getElementById('btnClosePageModal');
+        const btnPageEmpty = document.getElementById('btnPageEmpty');
+        const newPageNameInput = document.getElementById('newPageNameInput');
+        const cmsPagesList = document.getElementById('cmsPagesList');
+        const mainNavLogo = document.getElementById('mainNavLogo');
+
+
+        // =========================================
+        //  INIT & EVENTS
+        // =========================================
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (isCMSMode) {
+                // بارگذاری لیست سکشن‌ها از فایل JSON
+                await loadSectionManifest();
+
+                // اتصال رویدادها
+                cmsToggle.addEventListener('click', toggleCMS);
+                addSectionMain.addEventListener('click', openSectionModal);
+                sectionModalClose.addEventListener('click', closeSectionModal);
+                logoContainer.addEventListener('click', () => logoUpload.click());
+                logoUpload.addEventListener('change', handleLogoUpload);
+                heroBgUpload.addEventListener('change', handleHeroBgUpload);
+                
+                heroBgOpacitySlider.addEventListener('input', (e) => {
+                    heroBg.style.opacity = e.target.value;
+                });
+
+                mainContainer.addEventListener('input', (event) => {
+                    if (event.target.classList.contains('section-title-text')) {
+                        updateNavigation();
+                    }
+                });
+
+                // هندل کلیک مودال سکشن‌ها
+                sectionOptionsContainer.addEventListener('click', async function(e) {
+                    const option = e.target.closest('.section-option');
+                    if (option) {
+                        const typeAttr = option.getAttribute('data-type');
+                        const fileAttr = option.getAttribute('data-file');
+                        
+                        if (typeAttr) {
+                            await addSection(typeAttr, fileAttr);
+                            closeSectionModal();
+                        }
+                    }
+                });
+
+                // تنظیمات پیشرفته و رنگ‌ها
+                document.getElementById('applyAdvancedSettings').addEventListener('click', applyAdvancedSettings);
+                document.getElementById('saveProjectZip').addEventListener('click', saveProjectAsZip);
+                document.getElementById('importData').addEventListener('click', () => document.getElementById('loadData').click());
+                document.getElementById('loadData').addEventListener('change', importData);
+                
+                // اتصال رنگ‌ها
+                ['primaryColor', 'secondaryColor', 'buttonColor', 'textColor'].forEach(id => {
+                    document.getElementById(id).addEventListener('input', applyTheme);
+                    document.getElementById(id + 'Text').addEventListener('input', (e) => {
+                        document.getElementById(id).value = e.target.value;
+                        applyTheme();
+                    });
+                });
+
+                document.querySelectorAll('.alignment-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        document.querySelectorAll('.alignment-btn').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        applyTheme();
+                    });
+                });
+                
+                // آکاردئون پنل تنظیمات
+                document.querySelectorAll('.cms-section h3').forEach(header => {
+                    header.addEventListener('click', function(e) {
+                        this.parentElement.classList.toggle('open');
+                    });
+                });
+
+                document.getElementById('globalBgType').addEventListener('change', setupAdvancedBackgroundControls);
+                document.getElementById('globalBgImageUpload').addEventListener('change', handleGlobalBgImageUpload);
+                document.getElementById('globalBgVideoUpload').addEventListener('change', handleGlobalBgVideoUpload);
+
+                // منوی موبایل
+                hamburgerMenuBtn.addEventListener('click', toggleMobileMenu);
+
+                // --- PAGE MANAGER EVENTS ---
+                if(btnOpenPageModal) {
+                    btnOpenPageModal.addEventListener('click', () => {
+                        newPageNameInput.value = '';
+                        pageModal.classList.add('active');
+                    });
+                }
+                if(btnClosePageModal) {
+                    btnClosePageModal.addEventListener('click', () => {
+                        pageModal.classList.remove('active');
+                    });
+                }
+                if(btnPageEmpty) {
+                    btnPageEmpty.addEventListener('click', () => {
+                        const name = newPageNameInput.value.trim();
+                        if (!name) {
+                            showToast('لطفا نام صفحه را وارد کنید');
+                            newPageNameInput.focus();
+                            // Add a visual cue like red border
+                            newPageNameInput.style.borderColor = '#ff6b6b';
+                            setTimeout(() => newPageNameInput.style.borderColor = 'rgba(255,255,255,0.2)', 2000);
+                            return;
+                        }
+                        
+                        createNewPage(name);
+                        pageModal.classList.remove('active');
+                    });
+                }
+                
+                // Logo Click -> Home
+                if(mainNavLogo) {
+                    mainNavLogo.addEventListener('click', () => switchPage('home'));
+                }
+
+                // تلاش برای بارگذاری اطلاعات ذخیره شده
+                const hasData = loadSavedData();
+                
+                if (!hasData) {
+                    // فقط اگر هیچ سکشنی بجز هیرو نباشد
+                    if (document.querySelectorAll('.section').length <= 1) { 
+                        // Start with blank home
+                    }
+                }
+                
+                // فعال‌سازی درگ و دراپ
+                initSortable();
+                renderPageListInCMS();
+            }
+
+            // بستن مودال‌ها با کلیک بیرون
+            window.addEventListener('click', function(event) {
+                if (event.target === sectionModal) closeSectionModal();
+                if (event.target === pageModal && pageModal) pageModal.classList.remove('active');
+                if (isCMSMode && cmsControls.classList.contains('active')) {
+                    if (!cmsControls.contains(event.target) && event.target !== cmsToggle && !cmsToggle.contains(event.target)) {
+                        toggleCMS();
+                    }
+                }
+            });
+            
+            updateNavigation();
+        });
+
+
+        // =========================================
+        //  PAGE MANAGER FUNCTIONS
+        // =========================================
+
+        function createNewPage(name) {
+            saveCurrentPageState();
+            
+            const newId = 'page-' + Date.now();
+            // Slug ساده: تبدیل فاصله به خط تیره (برای نام فایل)
+            const slug = name.replace(/\s+/g, '-').toLowerCase();
+            
+            const newPage = {
+                id: newId,
+                title: name,
+                slug: slug,
+                sections: [] // Empty page
+            };
+            
+            pages.push(newPage);
+            switchPage(newId);
+            showToast(`صفحه "${name}" ایجاد شد`);
+        }
+
+        function switchPage(pageId) {
+            // 1. Save current page state
+            saveCurrentPageState();
+            
+            const targetPage = pages.find(p => p.id === pageId);
+            if(!targetPage) return;
+            
+            currentPageId = pageId;
+            
+            // 2. Clear DOM (except add button)
+            // نگه داشتن دکمه افزودن، حذف بقیه
+            const hero = document.querySelector('.hero-section');
+            if(hero) hero.remove();
+            
+            document.querySelectorAll('.main-container > .section').forEach(s => s.remove());
+            
+            // 3. Load target page sections
+            // اگر صفحه خانه است، هیرو سکشن (که جدا ذخیره شده بود یا دیفالت) را باید برگردانیم؟
+            // در معماری فعلی، Hero بخشی از DOM است.
+            // بیایید محتوای ذخیره شده را اینجکت کنیم.
+            
+            if (targetPage.sections && targetPage.sections.length > 0) {
+                // درج سکشن‌ها
+                // نکته: چون هیرو سکشن ساختار متفاوتی دارد، باید هندل شود.
+                // اما ما HTML کامل سکشن را ذخیره می‌کنیم.
+                
+                // معکوس حلقه چون insertAdjacentHTML ترتیب را عوض می‌کند اگر از اول برویم
+                // پس از آخر به اول اضافه می‌کنیم یا از range استفاده می‌کنیم
+                // ساده‌ترین راه: استفاده از innerHTML برای کانتینر نیست چون دکمه ادد آنجاست.
+                
+                // درج قبل از دکمه افزودن به ترتیب
+                targetPage.sections.forEach(secData => {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = secData.html;
+                    const sectionEl = tempDiv.firstElementChild;
+                    
+                    if (secData.type === 'hero') {
+                        // هیرو باید اول باشد
+                        mainContainer.insertBefore(sectionEl, mainContainer.firstChild);
+                    } else {
+                        addSectionMain.insertAdjacentElement('beforebegin', sectionEl);
+                    }
+                    
+                    // Re-init scripts
+                    if (SectionRegistry[secData.type] && SectionRegistry[secData.type].init) {
+                        SectionRegistry[secData.type].init(sectionEl);
+                    } else {
+                        // Generic script re-run (find scripts inside and eval/replace)
+                        const scripts = sectionEl.querySelectorAll('script');
+                        scripts.forEach(oldScript => {
+                            const newScript = document.createElement('script');
+                            Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                            newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                            oldScript.parentNode.replaceChild(newScript, oldScript);
+                        });
+                    }
+                });
+            } else if (pageId === 'home') {
+                // اگر خانه خالی بود (اولین بار)، هیرو دیفالت را برگردان
+                // (این بخش در loadSavedData هندل می‌شود، اینجا شاید لازم نباشد)
+            }
+            
+            updateNavigation();
+            renderPageListInCMS();
+            initSortable();
+        }
+
+        function saveCurrentPageState() {
+            const currentSections = [];
+            
+            // Hero
+            const hero = document.querySelector('.hero-section');
+            if(hero) {
+                currentSections.push({
+                    type: 'hero',
+                    html: hero.outerHTML
+                });
+            }
+            
+            // Other Sections
+            document.querySelectorAll('.main-container > .section').forEach(sec => {
+                currentSections.push({
+                    type: sec.dataset.section,
+                    html: sec.outerHTML
+                });
+            });
+            
+            const pageIndex = pages.findIndex(p => p.id === currentPageId);
+            if(pageIndex !== -1) {
+                pages[pageIndex].sections = currentSections;
+            }
+        }
+
+        function deletePage(pageId) {
+            if(pageId === 'home') {
+                showToast('صفحه اصلی قابل حذف نیست.');
+                return;
+            }
+            if(confirm('آیا از حذف این صفحه اطمینان دارید؟')) {
+                pages = pages.filter(p => p.id !== pageId);
+                if(currentPageId === pageId) switchPage('home');
+                else renderPageListInCMS();
+                updateNavigation();
+            }
+        }
+
+        function renamePage(pageId, newName, newSlug) {
+            const page = pages.find(p => p.id === pageId);
+            if(page) {
+                page.title = newName;
+                if(newSlug) page.slug = newSlug;
+                renderPageListInCMS();
+                updateNavigation();
+            }
+        }
+
+        function renderPageListInCMS() {
+            cmsPagesList.innerHTML = '';
+            pages.forEach(page => {
+                const li = document.createElement('li');
+                li.className = 'page-list-item';
+                if(page.id === currentPageId) li.classList.add('active');
+                
+                li.innerHTML = `
+                    <div class="page-info-row">
+                        <span class="page-name">${page.title} <small style="opacity:0.6">(${page.slug})</small></span>
+                        <div class="page-actions">
+                            <button class="btn-icon-small" onclick="switchPage('${page.id}')" title="ویرایش"><i class="fas fa-pen"></i></button>
+                            ${page.id !== 'home' ? `<button class="btn-icon-small" onclick="deletePage('${page.id}')" title="حذف" style="color:#ff6b6b"><i class="fas fa-trash"></i></button>` : ''}
+                            <button class="btn-icon-small" onclick="toggleEditRow('${page.id}')" title="تغییر نام"><i class="fas fa-cog"></i></button>
+                        </div>
+                    </div>
+                    <div class="page-edit-row" id="edit-row-${page.id}">
+                        <input type="text" class="cms-control" id="rename-title-${page.id}" value="${page.title}" placeholder="نام">
+                        <input type="text" class="cms-control" id="rename-slug-${page.id}" value="${page.slug}" placeholder="Slug">
+                        <button class="btn-icon-small" onclick="applyRename('${page.id}')"><i class="fas fa-check"></i></button>
+                    </div>
+                `;
+                cmsPagesList.appendChild(li);
+            });
+        }
+        
+        // Helper exposed to HTML
+        window.toggleEditRow = (id) => {
+            document.getElementById(`edit-row-${id}`).classList.toggle('show');
+        };
+        window.applyRename = (id) => {
+            const title = document.getElementById(`rename-title-${id}`).value;
+            const slug = document.getElementById(`rename-slug-${id}`).value;
+            renamePage(id, title, slug);
+        };
+        window.switchPage = switchPage;
+        window.deletePage = deletePage;
+
+
+        // =========================================
+        //  CORE FUNCTIONS (UPDATED)
+        // =========================================
+
+        async function loadSectionManifest() {
+            try {
+                const response = await fetch('sections/sections.json');
+                if (!response.ok) throw new Error('فایل sections.json یافت نشد.');
+                availableSections = await response.json();
+                populateSectionModal();
+            } catch (error) {
+                console.log('Using default/fallback sections only.');
+            }
+        }
+
+        function populateSectionModal() {
+            sectionOptionsContainer.querySelectorAll('.section-option:not([data-type="empty"])').forEach(el => el.remove());
+            availableSections.forEach(section => {
+                const option = document.createElement('div');
+                option.className = 'section-option';
+                option.dataset.type = section.id;
+                option.dataset.file = section.file;
+                option.innerHTML = `<i class="${section.icon}"></i><span>${section.name}</span>`;
+                sectionOptionsContainer.appendChild(option);
+            });
+        }
+
+        async function addSection(type, fileName = null) {
+            const sectionId = 'section-' + Date.now();
+            let sectionHTML = '';
+            let newSectionElement = null;
+
+            try {
+                if (type === 'empty') {
+                    sectionHTML = `
+                        <section class="section" id="${sectionId}" data-section="empty">
+                            <div class="drag-handle"><i class="fas fa-arrows-alt-v"></i></div>
+                            <div class="section-title">
+                                <div class="section-title-text" contenteditable="true">سکشن خالی</div>
+                                <div class="delete-section" onclick="deleteSection('${sectionId}')">🗑️</div>
+                            </div>
+                            <div class="section-content" contenteditable="true">محتوای خود را اینجا بنویسید...</div>
+                        </section>
+                    `;
+                } else if (fileName) {
+                    const response = await fetch(`sections/${fileName}`);
+                    if (!response.ok) throw new Error(`فایل ${fileName} بارگیری نشد.`);
+                    sectionHTML = await response.text();
+                    sectionHTML = sectionHTML.replace(/UNIQUE_ID/g, Date.now());
+                } else {
+                    showToast('نوع سکشن نامعتبر است');
+                    return;
+                }
+
+                if (sectionHTML) {
+                    addSectionMain.insertAdjacentHTML('beforebegin', sectionHTML);
+                    newSectionElement = addSectionMain.previousElementSibling;
+
+                    const scripts = newSectionElement.querySelectorAll('script');
+                    scripts.forEach(oldScript => {
+                        const newScript = document.createElement('script');
+                        Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                        newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                        oldScript.parentNode.replaceChild(newScript, oldScript);
+                    });
+
+                    if (SectionRegistry[type] && SectionRegistry[type].init) {
+                        SectionRegistry[type].init(newSectionElement);
+                    }
+                    
+                    // Don't update navigation here, we use Page Links now.
+                    initSortable(); 
+                    showToast('بخش جدید اضافه شد');
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('خطا در افزودن سکشن');
+            }
+        }
+
+        function deleteSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.remove();
+                showToast('بخش حذف شد');
+            }
+        }
+        
+        function initSortable() {
+            if (!isCMSMode) return;
+            const sections = document.querySelectorAll('.section');
+            let draggedItem = null;
+            sections.forEach(section => {
+                const dragHandle = section.querySelector('.drag-handle');
+                if (!dragHandle) return;
+                dragHandle.setAttribute('draggable', 'true');
+                dragHandle.addEventListener('dragstart', function(e) {
+                    draggedItem = section;
+                    section.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/plain', section.id);
+                    document.body.classList.add('is-dragging');
+                });
+                dragHandle.addEventListener('dragend', function() {
+                    section.classList.remove('dragging');
+                    draggedItem = null;
+                    document.body.classList.remove('is-dragging');
+                    document.querySelectorAll('.section').forEach(s => { s.classList.remove('drop-target'); });
+                });
+                section.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    if (draggedItem && draggedItem !== section) { section.classList.add('drop-target'); }
+                });
+                section.addEventListener('dragleave', function(e) {
+                    if (!section.contains(e.relatedTarget)) { section.classList.remove('drop-target'); }
+                });
+                section.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    section.classList.remove('drop-target');
+                    if (draggedItem && draggedItem !== section) {
+                        const allSections = Array.from(mainContainer.querySelectorAll('.section'));
+                        const draggedIndex = allSections.indexOf(draggedItem);
+                        const targetIndex = allSections.indexOf(section);
+                        if (draggedIndex < targetIndex) { section.after(draggedItem); } else { section.before(draggedItem); }
+                        mainContainer.appendChild(addSectionMain);
+                        showToast('جابجایی انجام شد');
+                    }
+                });
+            });
+        }
+
+        // =========================================
+        //  MEDIA & COMPRESSION
+        // =========================================
+        function compressImageWithSizeControl(file, settings, callback) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function(event) {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    let { width, height } = img;
+                    if (width > height && width > settings.maxSize) {
+                        height = Math.round((height * settings.maxSize) / width); width = settings.maxSize;
+                    } else if (height > settings.maxSize) {
+                        width = Math.round((width * settings.maxSize) / height); height = settings.maxSize;
+                    }
+                    canvas.width = width; canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    let outputMime = (file.type === 'image/png') ? 'image/png' : 'image/jpeg';
+                    let compressedDataUrl;
+                    if (outputMime === 'image/png') { compressedDataUrl = canvas.toDataURL('image/png'); }
+                    else {
+                        compressedDataUrl = canvas.toDataURL('image/jpeg', settings.quality);
+                        if (settings.maxFileSize) { compressedDataUrl = furtherCompress(canvas, settings.quality, settings.maxFileSize); }
+                    }
+                    callback(compressedDataUrl, file.name, file.type);
+                };
+            };
+        }
+        function furtherCompress(canvas, quality, targetSize) {
+            let dataUrl, size;
+            do {
+                dataUrl = canvas.toDataURL('image/jpeg', quality);
+                size = dataUrl.length * 0.75;
+                quality -= 0.1;
+            } while (size > targetSize && quality > 0.1);
+            return dataUrl;
+        }
+        function compressRegularImage(file, cb) { compressImageWithSizeControl(file, COMPRESSION_SETTINGS.regular, cb); }
+        function storeUploadedFile(id, name, dataUrl, type) {
+            const fileInfo = { id, originalName: name, dataUrl, type, uploadTime: new Date().toISOString() };
+            if (type.startsWith('image/')) uploadedFiles.images.push(fileInfo);
+            else if (type.startsWith('video/')) uploadedFiles.videos.push(fileInfo);
+            return id;
+        }
+        window.storeUploadedFile = storeUploadedFile;
+        window.compressRegularImage = compressRegularImage;
+        window.compressImageWithSizeControl = compressImageWithSizeControl;
+
+        function handleLogoUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                compressImageWithSizeControl(file, COMPRESSION_SETTINGS.logo, (url, name, type) => {
+                    storeUploadedFile('logo', name, url, type);
+                    businessLogo.src = url;
+                    footerLogo.src = url;
+                });
+                compressImageWithSizeControl(file, COMPRESSION_SETTINGS.favicon, (url, name, type) => { dynamicFavicon.href = url; });
+                compressImageWithSizeControl(file, COMPRESSION_SETTINGS.navlogo, (url, name, type) => { navLogo.src = url; });
+                showToast('لوگو آپدیت شد');
+            }
+            e.target.value = '';
+        }
+        function handleHeroBgUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                compressRegularImage(file, (url, name, type) => {
+                    storeUploadedFile('hero-bg', name, url, type);
+                    heroBg.src = url;
+                    heroBg.style.opacity = document.getElementById('heroBgOpacity').value;
+                    showToast('تصویر هیرو آپدیت شد');
+                });
+            }
+        }
+        function removeHeroBg() {
+            heroBg.src = ''; heroBg.style.opacity = '0'; showToast('تصویر هیرو حذف شد');
+        }
+        function handleGlobalBgImageUpload(e) {
+            const file = e.target.files[0];
+            if(file) {
+                compressRegularImage(file, (url, name, type) => {
+                    storeUploadedFile('global-bg', name, url, type);
+                    document.getElementById('background-container').innerHTML = `<img src="${url}" alt="bg">`;
+                    showToast('پس‌زمینه تغییر کرد');
+                });
+            }
+        }
+        function handleGlobalBgVideoUpload(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+            globalBackgroundVideoFile = file;
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (ev) => {
+                storeUploadedFile('global-bg-video', file.name, ev.target.result, file.type);
+                showToast('ویدیو انتخاب شد. دکمه اعمال را بزنید.');
+            }
+        }
+
+        // =========================================
+        //  UI & THEME
+        // =========================================
+        function toggleCMS() {
+            cmsControls.classList.toggle('active');
+            mainContainer.classList.toggle('cms-open');
+        }
+        function openSectionModal() { sectionModal.classList.add('active'); }
+        function closeSectionModal() { sectionModal.classList.remove('active'); }
+        function toggleMobileMenu() {
+            hamburgerMenuBtn.classList.toggle('active');
+            mobileNavMenu.classList.toggle('active');
+        }
+        function applyTheme() {
+            const primary = document.getElementById('primaryColor').value;
+            const secondary = document.getElementById('secondaryColor').value;
+            const button = document.getElementById('buttonColor').value;
+            const text = document.getElementById('textColor').value;
+            const alignment = document.querySelector('.alignment-btn.active').getAttribute('data-align');
+            
+            document.documentElement.style.setProperty('--primary-color', primary);
+            document.documentElement.style.setProperty('--secondary-color', secondary);
+            document.documentElement.style.setProperty('--button-color', button);
+            document.documentElement.style.setProperty('--text-color', text);
+            document.documentElement.style.setProperty('--text-align', alignment);
+            document.documentElement.setAttribute('dir', alignment === 'right' ? 'rtl' : 'ltr');
+            
+            const isRTL = alignment === 'right';
+            document.documentElement.style.setProperty('--flex-direction', isRTL ? 'row' : 'row-reverse');
+            document.documentElement.style.setProperty('--float-direction', isRTL ? 'right' : 'left');
+            if(document.querySelector('.nav-logo')) document.querySelector('.nav-logo').style.order = isRTL ? 1 : 0;
+
+            if (document.getElementById('globalBgType').value === 'gradient') {
+                 document.body.style.background = `linear-gradient(135deg, ${primary} 0%, ${secondary} 100%)`;
+            }
+        }
+        function setupAdvancedBackgroundControls() {
+            const bgType = document.getElementById('globalBgType').value;
+            document.querySelectorAll('.bg-type-settings').forEach(el => el.style.display = 'none');
+            document.getElementById(`bg-type-${bgType}`).style.display = 'block';
+            document.getElementById('bg-opacity-control').style.display = (bgType === 'image' || bgType === 'video') ? 'block' : 'none';
+        }
+        function applyAdvancedSettings() {
+            const bgType = document.getElementById('globalBgType').value;
+            const container = document.getElementById('background-container');
+            const opacity = document.getElementById('globalBgOpacity').value;
+            container.style.opacity = (bgType === 'gradient') ? '1' : opacity;
+            if (bgType === 'gradient') {
+                container.innerHTML = ''; applyTheme();
+            } else if (bgType === 'video') {
+                if (globalBackgroundVideoFile && globalBackgroundVideoFile.size) {
+                    const vid = document.createElement('video');
+                    vid.src = URL.createObjectURL(globalBackgroundVideoFile);
+                    vid.autoplay = true; vid.muted = true; vid.loop = true; vid.playsInline = true;
+                    container.innerHTML = ''; container.appendChild(vid);
+                }
+            } else if (bgType === 'animation') {
+                const css = document.getElementById('customCss').value;
+                let style = document.getElementById('custom-user-css');
+                if(!style) { style = document.createElement('style'); style.id = 'custom-user-css'; document.head.appendChild(style); }
+                style.innerHTML = css;
+            }
+            const js = document.getElementById('customJs').value;
+            if(js) { try { eval(js); showToast('JS اجرا شد'); } catch(e) { console.error(e); } }
+            showToast('تنظیمات اعمال شد');
+        }
+
+        // =========================================
+        //  NAVIGATION (PAGES)
+        // =========================================
+        function updateNavigation() {
+            const containers = [navContainer, navContainerMobile];
+            containers.forEach(c => { if(c) c.innerHTML = ''; });
+            
+            // Build nav based on PAGES, not sections
+            pages.forEach(page => {
+                const createItem = (isMobile) => {
+                    // در ادیتور از onclick استفاده می‌کنیم، در خروجی href
+                    // اما اینجا ما لینک می‌سازیم، رفتار کلیک را با JS کنترل می‌کنیم
+                    const item = document.createElement('a');
+                    item.className = 'nav-item';
+                    item.dataset.pageId = page.id;
+                    if (page.id === currentPageId) item.classList.add('active');
+                    
+                    // در حالت ادیتور: لینک ندارد، کلیک سوئیچ می‌کند
+                    // در حالت خروجی: لینک دارد
+                    item.href = '#'; 
+                    item.innerHTML = `<span>${page.title}</span>`;
+                    
+                    item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        if (isCMSMode) {
+                            switchPage(page.id);
+                            if(isMobile) toggleMobileMenu();
+                        }
+                    });
+                    
+                    return item;
+                };
+
+                if(navContainer) navContainer.appendChild(createItem(false));
+                if(navContainerMobile) navContainerMobile.appendChild(createItem(true));
+            });
+        }
+
+        // =========================================
+        //  DATA MANAGEMENT (UPDATED FOR MULTI-PAGE)
+        // =========================================
+
+        function loadSavedData() {
+            const saved = localStorage.getItem('gitiarts_project');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    const pData = data.projectData || data;
+                    if(data.uploadedFiles) uploadedFiles = data.uploadedFiles;
+                    
+                    // Restore Global Settings
+                    document.getElementById('businessName').textContent = pData.businessName;
+                    document.getElementById('businessTagline').textContent = pData.businessTagline;
+                    
+                    if(pData.primaryColor) {
+                        document.getElementById('primaryColor').value = pData.primaryColor;
+                        document.getElementById('secondaryColor').value = pData.secondaryColor;
+                        document.getElementById('buttonColor').value = pData.buttonColor;
+                        document.getElementById('textColor').value = pData.textColor;
+                        applyTheme();
+                    }
+
+                    // Restore Pages
+                    if (pData.pages && pData.pages.length > 0) {
+                        pages = pData.pages;
+                        // Load Home Page initially
+                        switchPage('home');
+                        return true;
+                    }
+                } catch(e) { console.error(e); }
+            }
+            return false;
+        }
+
+        function getCurrentProjectData() {
+            saveCurrentPageState(); // Ensure current changes are saved to array
+            
+            const data = {
+                businessName: document.getElementById('businessName').textContent,
+                businessTagline: document.getElementById('businessTagline').textContent,
+                footerText: document.getElementById('footerText').textContent,
+                copyrightText: document.getElementById('copyrightText').textContent,
+                primaryColor: document.getElementById('primaryColor').value,
+                secondaryColor: document.getElementById('secondaryColor').value,
+                buttonColor: document.getElementById('buttonColor').value,
+                textColor: document.getElementById('textColor').value,
+                textAlign: getComputedStyle(document.body).getPropertyValue('--text-align'),
+                pages: pages, // Save all pages
+                settings: {
+                    background: {
+                        type: document.getElementById('globalBgType').value,
+                        opacity: document.getElementById('globalBgOpacity').value
+                    }
+                }
+            };
+            
+            return { projectData: data, uploadedFiles };
+        }
+
+        async function saveProjectAsZip() {
+            saveCurrentPageState(); // Final save
+            showToast('در حال ساخت فایل زیپ...');
+            const zip = new JSZip();
+            const fullData = getCurrentProjectData();
+            
+            // Assets
+            const assets = zip.folder('assets');
+            uploadedFiles.images.forEach((f, i) => {
+                if(f.dataUrl.includes(',')) assets.file(`images/${i}.png`, f.dataUrl.split(',')[1], {base64:true});
+            });
+
+            // Base HTML Template (Cleaned)
+            // Create a document clone to clean up
+            const doc = document.implementation.createHTMLDocument('Project');
+            doc.documentElement.innerHTML = document.documentElement.innerHTML;
+            
+            // Remove CMS elements from template
+            const selectorsToRemove = [
+                '.cms-toggle', '.cms-controls', '.add-section-main', '.section-modal', '.page-modal',
+                '.toast', '.drag-handle', '.delete-section', 
+                '.slide-edit-controls', '.slider-add-container', '.resize-handle-container'
+            ];
+            selectorsToRemove.forEach(sel => {
+                doc.querySelectorAll(sel).forEach(el => el.remove());
+            });
+            doc.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+            doc.body.classList.add('visitor-mode');
+            
+            // Clean Navigation Links for Export
+            // We need to regenerate nav in the export loop because relative paths might change?
+            // Actually, for a flat structure, paths are simple filenames.
+            
+            const navItems = doc.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                const pageId = item.dataset.pageId;
+                const targetPage = pages.find(p => p.id === pageId);
+                if(targetPage) {
+                    item.href = targetPage.slug + '.html';
+                    // Remove event listeners by cloning
+                    const newItem = item.cloneNode(true);
+                    item.parentNode.replaceChild(newItem, item);
+                }
+            });
+            
+            // Fix Logo Link
+            const logoLink = doc.querySelector('.nav-logo');
+            if(logoLink) {
+                // Wrap logo in A tag if not already
+                if(logoLink.tagName !== 'A') {
+                    const a = document.createElement('a');
+                    a.href = 'index.html';
+                    a.className = logoLink.className;
+                    a.innerHTML = logoLink.innerHTML;
+                    logoLink.parentNode.replaceChild(a, logoLink);
+                }
+            }
+
+            // Loop through pages and generate HTML files
+            pages.forEach(page => {
+                // Clone the base doc again to avoid contamination
+                const pageDoc = doc.cloneNode(true);
+                const mainContainer = pageDoc.getElementById('mainContainer');
+                
+                // Clear existing sections in template
+                // (Template currently has whatever was on screen when saving)
+                const hero = pageDoc.querySelector('.hero-section');
+                if(hero) hero.remove();
+                mainContainer.innerHTML = ''; 
+                
+                // Add Page Sections
+                page.sections.forEach(secData => {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = secData.html;
+                    const el = tempDiv.firstElementChild;
+                    
+                    // Clean element (remove admin tools inside sections)
+                    el.querySelectorAll('.drag-handle, .delete-section').forEach(x => x.remove());
+                    el.querySelectorAll('[contenteditable]').forEach(x => x.removeAttribute('contenteditable'));
+                    
+                    // Remove specific admin classes if any
+                    // (already handled by visitor-mode CSS, but good to be safe)
+                    
+                    if (secData.type === 'hero') {
+                        // Hero needs to be reconstructed or just appended?
+                        // In editor it's .hero-section then .main-container.
+                        // In our simplified export logic, let's put hero inside mainContainer or body?
+                        // The structure in editor: body > mainContainer > hero
+                        mainContainer.appendChild(el);
+                    } else {
+                        mainContainer.appendChild(el);
+                    }
+                });
+                
+                // Update Active State in Nav
+                const activeNav = pageDoc.querySelector(`.nav-item[data-page-id="${page.id}"]`);
+                pageDoc.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                if(activeNav) activeNav.classList.add('active');
+
+                // Generate HTML string
+                let htmlContent = '<!DOCTYPE html>\n' + pageDoc.documentElement.outerHTML;
+                
+                // Define filename
+                const filename = (page.id === 'home') ? 'index.html' : `${page.slug}.html`;
+                zip.file(filename, htmlContent);
+            });
+
+            zip.file("data.json", JSON.stringify(fullData));
+            
+            const content = await zip.generateAsync({type:"blob"});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(content);
+            a.download = "website.zip";
+            a.click();
+            showToast('دانلود آغاز شد');
+        }
+
+        function showToast(msg) {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+        
+        // Expose helper globally
+        window.showToast = showToast;
+
+        // ذخیره اتوماتیک
+        setInterval(() => {
+            if(isCMSMode) localStorage.setItem('gitiarts_project', JSON.stringify(getCurrentProjectData()));
+        }, 10000);
+
+    </script>
+</body>
+</html>

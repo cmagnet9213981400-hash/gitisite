@@ -1,0 +1,584 @@
+<!-- 
+  =================================
+  ماژول: اسلایدر تصاویر (Slider)
+  =================================
+  شامل: 
+  - اسلایدر ریسپانسیو با قابلیت تغییر ارتفاع
+  - مخفی‌سازی هوشمند عناصر مدیریتی در خروجی
+  - ناوبری کامل (دکمه‌ها و دایره‌ها)
+  - مقاوم در برابر حالت خروجی (Visitor Mode)
+-->
+<section class="section" id="section-UNIQUE_ID" data-section="slider">
+    <!-- هندل جابجایی سکشن -->
+    <div class="drag-handle">
+        <i class="fas fa-arrows-alt-v"></i>
+    </div>
+    
+    <!-- عنوان سکشن -->
+    <div class="section-title">
+        <div class="section-title-text" contenteditable="true">اسلایدر تصاویر</div>
+        <div class="delete-section" onclick="deleteSection('section-UNIQUE_ID')">🗑️</div>
+    </div>
+    
+    <!-- محتوای اصلی -->
+    <div class="section-content">
+        
+        <!-- کانتینر اصلی اسلایدر -->
+        <div class="slider-container" id="slider-container-UNIQUE_ID" style="height: 400px;">
+            <div class="slider-track" id="slider-track-UNIQUE_ID">
+                <!-- اسلاید نمونه -->
+                <div class="slide-item active">
+                    <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='400' viewBox='0 0 800 400'><rect width='800' height='400' fill='%23ddd'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='40' fill='%23999'>تصویر نمونه</text></svg>" class="slide-img" alt="Slide 1">
+                    
+                    <!-- کنترل‌های ویرایش -->
+                    <div class="slide-edit-controls">
+                        <button class="btn-upload-slide" title="تغییر تصویر"><i class="fas fa-camera"></i></button>
+                        <button class="btn-remove-slide" title="حذف اسلاید"><i class="fas fa-trash"></i></button>
+                        <input type="file" accept="image/*" class="slide-file-input" style="display: none;">
+                    </div>
+
+                    <!-- کپشن -->
+                    <div class="slide-caption">
+                        <h3 contenteditable="true" class="slide-title" data-placeholder="عنوان اسلاید">عنوان اسلاید</h3>
+                        <p contenteditable="true" class="slide-desc" data-placeholder="توضیحات اسلاید را اینجا بنویسید">توضیحات اسلاید را اینجا بنویسید</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- دکمه‌های ناوبری -->
+            <button class="slider-nav prev" id="prev-UNIQUE_ID">&#10095;</button>
+            <button class="slider-nav next" id="next-UNIQUE_ID">&#10094;</button>
+
+            <!-- دکمه‌های نقطه‌ای -->
+            <div class="slider-dots" id="dots-UNIQUE_ID"></div>
+        </div>
+
+        <!-- دکمه افزودن اسلاید -->
+        <div class="slider-add-container">
+            <button class="btn-add-slide" id="add-slide-UNIQUE_ID">
+                <i class="fas fa-plus"></i> افزودن اسلاید جدید
+            </button>
+            <input type="file" accept="image/*" id="add-slide-input-UNIQUE_ID" style="display: none;">
+        </div>
+
+        <!-- هندل تغییر ارتفاع -->
+        <div class="resize-handle-container">
+            <div class="resize-island" id="resize-handle-UNIQUE_ID" title="برای تغییر ارتفاع بکشید">
+                <i class="fas fa-grip-lines"></i>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- استایل‌های اختصاصی اسلایدر -->
+    <style>
+        #section-UNIQUE_ID .slider-container {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            border-radius: 15px;
+            background: #f0f0f0;
+            transition: height 0.1s ease-out;
+        }
+
+        #section-UNIQUE_ID .slider-track {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        #section-UNIQUE_ID .slide-item {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 0;
+        }
+
+        #section-UNIQUE_ID .slide-item.active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        #section-UNIQUE_ID .slide-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* استایل کپشن */
+        #section-UNIQUE_ID .slide-caption {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 40%;
+            backdrop-filter: blur(5px);
+            text-align: right;
+            z-index: 2;
+            transition: opacity 0.3s;
+        }
+        
+        [dir="ltr"] #section-UNIQUE_ID .slide-caption {
+            right: auto;
+            left: 40px;
+            text-align: left;
+        }
+
+        #section-UNIQUE_ID .slide-title {
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+            outline: none;
+        }
+
+        #section-UNIQUE_ID .slide-desc {
+            font-size: 1rem;
+            line-height: 1.5;
+            outline: none;
+        }
+
+        /* Visitor Mode Styles */
+        body.visitor-mode #section-UNIQUE_ID {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+        }
+
+        body.visitor-mode #section-UNIQUE_ID .section-title,
+        body.visitor-mode #section-UNIQUE_ID .drag-handle,
+        body.visitor-mode #section-UNIQUE_ID .delete-section,
+        body.visitor-mode #section-UNIQUE_ID .slide-edit-controls,
+        body.visitor-mode #section-UNIQUE_ID .slider-add-container,
+        body.visitor-mode #section-UNIQUE_ID .resize-handle-container {
+            display: none !important;
+        }
+
+        body.visitor-mode .hide-in-visitor {
+            display: none !important;
+        }
+
+        /* دکمه‌های کنترلی اسلاید */
+        #section-UNIQUE_ID .slide-edit-controls {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        #section-UNIQUE_ID .slide-edit-controls button {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            color: #333;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.2s;
+        }
+
+        #section-UNIQUE_ID .slide-edit-controls button:hover {
+            transform: scale(1.1);
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* ناوبری چپ و راست */
+        #section-UNIQUE_ID .slider-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            z-index: 5;
+            font-size: 1.2rem;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        #section-UNIQUE_ID .slider-nav:hover {
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        #section-UNIQUE_ID .prev { right: 10px; }
+        #section-UNIQUE_ID .next { left: 10px; }
+        
+        [dir="ltr"] #section-UNIQUE_ID .prev { right: auto; left: 10px; }
+        [dir="ltr"] #section-UNIQUE_ID .next { left: auto; right: 10px; }
+
+        /* نقطه‌های ناوبری */
+        #section-UNIQUE_ID .slider-dots {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 5;
+        }
+
+        #section-UNIQUE_ID .dot {
+            width: 12px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        #section-UNIQUE_ID .dot.active {
+            background: white;
+            transform: scale(1.2);
+        }
+
+        /* دکمه افزودن اسلاید */
+        #section-UNIQUE_ID .slider-add-container {
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        #section-UNIQUE_ID .btn-add-slide {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        /* هندل تغییر سایز */
+        #section-UNIQUE_ID .resize-handle-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        #section-UNIQUE_ID .resize-island {
+            width: 60px;
+            height: 24px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: ns-resize;
+            color: var(--text-color);
+            opacity: 0.7;
+            transition: all 0.2s;
+        }
+
+        #section-UNIQUE_ID .resize-island:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        @media (max-width: 768px) {
+            #section-UNIQUE_ID .slide-caption {
+                max-width: 80%;
+                right: 50%;
+                transform: translateX(50%);
+                bottom: 40px;
+                text-align: center;
+            }
+            [dir="ltr"] #section-UNIQUE_ID .slide-caption {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+    </style>
+
+    <!-- منطق جاوااسکریپت ماژول -->
+    <script>
+        (function() {
+            const uid = 'UNIQUE_ID';
+            const container = document.getElementById('slider-container-' + uid);
+            const track = document.getElementById('slider-track-' + uid);
+            const dotsContainer = document.getElementById('dots-UNIQUE_ID');
+            const prevBtn = document.getElementById('prev-' + uid);
+            const nextBtn = document.getElementById('next-' + uid);
+            const addSlideBtn = document.getElementById('add-slide-' + uid);
+            const addSlideInput = document.getElementById('add-slide-input-' + uid);
+            const resizeHandle = document.getElementById('resize-handle-' + uid);
+            
+            let currentSlide = 0;
+            let slideInterval;
+            const INTERVAL_TIME = 5000;
+
+            // --- منطق تغییر سایز (Resize) ---
+            let isResizing = false;
+            let startY, startHeight;
+
+            if (resizeHandle) {
+                resizeHandle.addEventListener('mousedown', function(e) {
+                    isResizing = true;
+                    startY = e.clientY;
+                    startHeight = parseInt(getComputedStyle(container).height, 10);
+                    document.body.style.cursor = 'ns-resize';
+                    e.preventDefault();
+                });
+
+                document.addEventListener('mousemove', function(e) {
+                    if (!isResizing) return;
+                    const dy = e.clientY - startY;
+                    const newHeight = startHeight + dy;
+                    if (newHeight > 200 && newHeight < 800) {
+                        container.style.height = newHeight + 'px';
+                    }
+                });
+
+                document.addEventListener('mouseup', function() {
+                    if (isResizing) {
+                        isResizing = false;
+                        document.body.style.cursor = 'default';
+                    }
+                });
+            }
+
+            // --- بررسی محتوای پیش‌فرض ---
+            function checkDefaultContent(el) {
+                const text = el.textContent.trim();
+                const placeholder = el.getAttribute('data-placeholder');
+                
+                if (text === '' || text === placeholder) {
+                    el.classList.add('hide-in-visitor');
+                } else {
+                    el.classList.remove('hide-in-visitor');
+                }
+                
+                const caption = el.closest('.slide-caption');
+                if (caption) {
+                    const title = caption.querySelector('.slide-title');
+                    const desc = caption.querySelector('.slide-desc');
+                    const titleHidden = title.classList.contains('hide-in-visitor');
+                    const descHidden = desc.classList.contains('hide-in-visitor');
+                    
+                    if (titleHidden && descHidden) {
+                        caption.classList.add('hide-in-visitor');
+                    } else {
+                        caption.classList.remove('hide-in-visitor');
+                    }
+                }
+            }
+
+            // --- منطق اسلایدر ---
+
+            function updateSlider() {
+                const slides = track.querySelectorAll('.slide-item');
+                if (slides.length === 0) return;
+
+                if (currentSlide >= slides.length) currentSlide = 0;
+                if (currentSlide < 0) currentSlide = slides.length - 1;
+
+                slides.forEach((slide, index) => {
+                    if (index === currentSlide) {
+                        slide.classList.add('active');
+                        slide.style.opacity = '1';
+                        slide.style.zIndex = '1';
+                    } else {
+                        slide.classList.remove('active');
+                        slide.style.opacity = '0';
+                        slide.style.zIndex = '0';
+                    }
+                });
+
+                renderDots(slides.length);
+                const dots = dotsContainer.querySelectorAll('.dot');
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === currentSlide);
+                });
+            }
+
+            function renderDots(count) {
+                // اگر تعداد تغییر نکرده، بازسازی نکن (برای جلوگیری از پرش)
+                if (dotsContainer.children.length !== count) {
+                    dotsContainer.innerHTML = '';
+                    for (let i = 0; i < count; i++) {
+                        const dot = document.createElement('div');
+                        dot.classList.add('dot');
+                        if (i === currentSlide) dot.classList.add('active');
+                        dot.addEventListener('click', () => {
+                            currentSlide = i;
+                            updateSlider();
+                            resetInterval();
+                        });
+                        dotsContainer.appendChild(dot);
+                    }
+                }
+            }
+
+            function nextSlide() {
+                currentSlide++;
+                updateSlider();
+            }
+
+            function prevSlide() {
+                currentSlide--;
+                updateSlider();
+            }
+
+            function resetInterval() {
+                if (slideInterval) clearInterval(slideInterval);
+                slideInterval = setInterval(nextSlide, INTERVAL_TIME);
+            }
+
+            if (nextBtn) nextBtn.addEventListener('click', () => { nextSlide(); resetInterval(); });
+            if (prevBtn) prevBtn.addEventListener('click', () => { prevSlide(); resetInterval(); });
+
+            resetInterval();
+            updateSlider();
+
+            // --- مدیریت افزودن اسلاید ---
+
+            if (addSlideBtn) {
+                addSlideBtn.addEventListener('click', () => {
+                    addNewSlide();
+                });
+            }
+
+            function addNewSlide() {
+                const newSlide = document.createElement('div');
+                newSlide.className = 'slide-item';
+                const placeholderSvg = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='400' viewBox='0 0 800 400'><rect width='800' height='400' fill='%23eee'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='40' fill='%23aaa'>تصویر جدید</text></svg>";
+                
+                newSlide.innerHTML = `
+                    <img src="${placeholderSvg}" class="slide-img" alt="Slide">
+                    <div class="slide-edit-controls">
+                        <button class="btn-upload-slide" title="تغییر تصویر"><i class="fas fa-camera"></i></button>
+                        <button class="btn-remove-slide" title="حذف اسلاید"><i class="fas fa-trash"></i></button>
+                        <input type="file" accept="image/*" class="slide-file-input" style="display: none;">
+                    </div>
+                    <div class="slide-caption hide-in-visitor">
+                        <h3 contenteditable="true" class="slide-title hide-in-visitor" data-placeholder="عنوان اسلاید">عنوان اسلاید</h3>
+                        <p contenteditable="true" class="slide-desc hide-in-visitor" data-placeholder="توضیحات اسلاید را اینجا بنویسید">توضیحات اسلاید را اینجا بنویسید</p>
+                    </div>
+                `;
+                track.appendChild(newSlide);
+                setupSlideEvents(newSlide);
+                
+                currentSlide = track.querySelectorAll('.slide-item').length - 1;
+                updateSlider();
+                resetInterval();
+
+                // باز شدن خودکار پنجره آپلود
+                const fileInput = newSlide.querySelector('.slide-file-input');
+                if (fileInput) setTimeout(() => fileInput.click(), 100);
+            }
+
+            function setupSlideEvents(slide) {
+                const uploadBtn = slide.querySelector('.btn-upload-slide');
+                const removeBtn = slide.querySelector('.btn-remove-slide');
+                const fileInput = slide.querySelector('.slide-file-input');
+                const img = slide.querySelector('.slide-img');
+                const title = slide.querySelector('.slide-title');
+                const desc = slide.querySelector('.slide-desc');
+
+                // با استفاده از if چک می‌کنیم که المان‌ها وجود داشته باشند
+                // چون در خروجی نهایی ممکن است توسط سیستم حذف شده باشند
+                if (uploadBtn && fileInput) {
+                    uploadBtn.addEventListener('click', () => fileInput.click());
+                    fileInput.addEventListener('change', (e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                            compressImageToSize(file, 300, (url) => {
+                                img.src = url;
+                                if (typeof window.storeUploadedFile === 'function') {
+                                    window.storeUploadedFile('slide-' + Date.now(), file.name, url, file.type);
+                                }
+                            });
+                        }
+                    });
+                }
+
+                if (removeBtn) {
+                    removeBtn.addEventListener('click', () => {
+                        if (track.children.length > 1) {
+                            slide.remove();
+                            if (currentSlide >= track.children.length) currentSlide = track.children.length - 1;
+                            updateSlider();
+                        } else {
+                            alert('حداقل یک اسلاید باید وجود داشته باشد.');
+                        }
+                    });
+                }
+                
+                // مدیریت متن‌ها
+                [title, desc].forEach(el => {
+                    if (!el) return;
+                    checkDefaultContent(el);
+                    el.addEventListener('input', () => checkDefaultContent(el));
+                    el.addEventListener('focus', function() {
+                        if (this.textContent.trim() === this.getAttribute('data-placeholder')) {
+                            this.textContent = '';
+                        }
+                    });
+                    el.addEventListener('blur', function() {
+                        if (this.textContent.trim() === '') {
+                            this.textContent = this.getAttribute('data-placeholder');
+                        }
+                        checkDefaultContent(this);
+                    });
+                });
+            }
+
+            function compressImageToSize(file, maxKB, callback) {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        const MAX_WIDTH = 1920; const MAX_HEIGHT = 1080;
+                        if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+                            if (width / height > MAX_WIDTH / MAX_HEIGHT) {
+                                height = Math.round((height * MAX_WIDTH) / width); width = MAX_WIDTH;
+                            } else {
+                                width = Math.round((width * MAX_HEIGHT) / height); height = MAX_HEIGHT;
+                            }
+                        }
+                        canvas.width = width; canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        let quality = 0.9;
+                        let dataUrl = canvas.toDataURL('image/jpeg', quality);
+                        let sizeKB = dataUrl.length * 0.75 / 1024;
+                        while (sizeKB > maxKB && quality > 0.1) {
+                            quality -= 0.05;
+                            dataUrl = canvas.toDataURL('image/jpeg', quality);
+                            sizeKB = dataUrl.length * 0.75 / 1024;
+                        }
+                        callback(dataUrl);
+                    };
+                };
+            }
+
+            track.querySelectorAll('.slide-item').forEach(setupSlideEvents);
+
+        })();
+    </script>
+</section>

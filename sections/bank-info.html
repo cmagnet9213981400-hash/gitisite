@@ -1,0 +1,420 @@
+<!-- 
+  =================================
+  ماژول: اطلاعات بانکی (Bank Info)
+  =================================
+  شامل: 
+  - تشخیص خودکار نام بانک (بدون آیکون)
+  - مخفی‌سازی فیلدهای خالی در خروجی
+  - تغییر متن به "کپی شد"
+-->
+<section class="section" id="section-UNIQUE_ID" data-section="bank-info">
+    <!-- هندل جابجایی -->
+    <div class="drag-handle">
+        <i class="fas fa-arrows-alt-v"></i>
+    </div>
+    
+    <!-- عنوان سکشن -->
+    <div class="section-title">
+        <div class="section-title-text" contenteditable="true">اطلاعات پرداخت</div>
+        <div class="delete-section" onclick="deleteSection('section-UNIQUE_ID')">🗑️</div>
+    </div>
+    
+    <!-- محتوای اصلی -->
+    <div class="section-content">
+        <p class="bank-desc" contenteditable="true">برای پرداخت، می‌توانید از اطلاعات حساب‌های زیر استفاده کنید.</p>
+        
+        <!-- گرید کارت‌ها -->
+        <div class="bank-grid" id="bank-grid-UNIQUE_ID">
+            <!-- کارت‌ها اینجا اضافه می‌شوند -->
+        </div>
+
+        <!-- دکمه افزودن کارت -->
+        <div class="bank-controls">
+            <button class="btn-add-bank" id="add-bank-UNIQUE_ID">
+                <i class="fas fa-plus-circle"></i> افزودن کارت جدید
+            </button>
+        </div>
+    </div>
+
+    <!-- استایل‌های اختصاصی -->
+    <style>
+        #section-UNIQUE_ID .bank-desc {
+            margin-bottom: 20px;
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        #section-UNIQUE_ID .bank-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        #section-UNIQUE_ID .bank-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 25px;
+            position: relative;
+            transition: all 0.3s;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            color: var(--text-color);
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #section-UNIQUE_ID .bank-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        /* هدر کارت (فقط نام بانک) */
+        #section-UNIQUE_ID .bank-header {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        #section-UNIQUE_ID .bank-name-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-align: center;
+            outline: none;
+        }
+        
+        #section-UNIQUE_ID .bank-name-input::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* فیلدها */
+        #section-UNIQUE_ID .bank-field-group {
+            margin-bottom: 15px;
+            position: relative;
+            transition: opacity 0.3s;
+        }
+        
+        #section-UNIQUE_ID .bank-field-group.is-empty {
+            opacity: 0.7;
+        }
+
+        #section-UNIQUE_ID .bank-label {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        #section-UNIQUE_ID .bank-input {
+            width: 100%;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 10px 12px;
+            color: var(--text-color);
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            text-align: center;
+            outline: none;
+            transition: all 0.3s;
+            direction: ltr;
+        }
+
+        #section-UNIQUE_ID .bank-input:focus {
+            background: rgba(0,0,0,0.3);
+            border-color: var(--primary-color);
+        }
+        
+        #section-UNIQUE_ID .bank-input.copy-success {
+            background: rgba(46, 204, 113, 0.2) !important;
+            color: #2ecc71 !important;
+            border-color: #2ecc71 !important;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+            letter-spacing: 0 !important;
+            font-weight: bold;
+        }
+
+        /* دکمه حذف کارت */
+        #section-UNIQUE_ID .btn-delete-card {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        #section-UNIQUE_ID .bank-card:hover .btn-delete-card {
+            opacity: 1;
+            top: 10px;
+            left: 10px;
+        }
+
+        /* کنترل افزودن */
+        #section-UNIQUE_ID .bank-controls {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #section-UNIQUE_ID .btn-add-bank {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: background 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #section-UNIQUE_ID .btn-add-bank:hover {
+            background: var(--primary-color);
+        }
+
+        /* Visitor Mode Styles */
+        body.visitor-mode #section-UNIQUE_ID .bank-input,
+        body.visitor-mode #section-UNIQUE_ID .bank-name-input {
+            background: transparent;
+            border: none;
+            padding: 5px 0;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            color: var(--text-color); /* اطمینان از رنگ متن */
+        }
+        
+        body.visitor-mode #section-UNIQUE_ID .bank-name-input {
+            cursor: default;
+        }
+
+        body.visitor-mode #section-UNIQUE_ID .bank-input:hover {
+            color: var(--primary-color);
+            transform: scale(1.05);
+        }
+
+        body.visitor-mode #section-UNIQUE_ID .btn-delete-card,
+        body.visitor-mode #section-UNIQUE_ID .bank-controls,
+        body.visitor-mode #section-UNIQUE_ID .delete-section,
+        body.visitor-mode #section-UNIQUE_ID .drag-handle {
+            display: none !important;
+        }
+
+        /* مخفی کردن فیلدهای خالی در خروجی نهایی */
+        body.visitor-mode #section-UNIQUE_ID .bank-field-group.is-empty {
+            display: none !important;
+        }
+    </style>
+
+    <!-- منطق جاوااسکریپت -->
+    <script>
+        (function() {
+            const uid = 'UNIQUE_ID';
+            const grid = document.getElementById('bank-grid-' + uid);
+            const addBtn = document.getElementById('add-bank-' + uid);
+
+            // لیست نام بانک‌ها بر اساس BIN
+            const banks = {
+                "603799": "بانک ملی", "589210": "بانک سپه", "627961": "بانک صنعت و معدن", "603770": "بانک کشاورزی",
+                "628023": "بانک مسکن", "627353": "بانک تجارت", "502229": "بانک پاسارگاد", "627412": "بانک اقتصاد نوین",
+                "622106": "بانک پارسیان", "603769": "بانک صادرات", "610433": "بانک ملت", "621986": "بانک سامان",
+                "639346": "بانک سینا", "639607": "بانک سرمایه", "636214": "بانک آینده", "502806": "بانک شهر",
+                "502938": "بانک دی", "606373": "بانک مهر ایران", "627381": "بانک انصار", "505785": "بانک ایران زمین",
+                "505416": "بانک گردشگری", "639599": "بانک قوامین", "589463": "بانک رفاه", "627760": "پست بانک",
+                "502908": "توسعه تعاون", "627488": "کارآفرین", "504172": "بانک رسالت"
+            };
+
+            if (addBtn) {
+                addBtn.addEventListener('click', () => {
+                    addCard();
+                });
+            }
+
+            function addCard() {
+                const card = document.createElement('div');
+                card.className = 'bank-card';
+
+                card.innerHTML = `
+                    <button class="btn-delete-card" title="حذف کارت">&times;</button>
+                    
+                    <div class="bank-header">
+                        <input type="text" class="bank-name-input" placeholder="نام بانک" value="نام بانک">
+                    </div>
+                    
+                    <div class="bank-field-group is-empty">
+                        <label class="bank-label">شماره کارت</label>
+                        <input type="text" class="bank-input card-num" placeholder="0000-0000-0000-0000" maxlength="19">
+                    </div>
+                    
+                    <div class="bank-field-group is-empty">
+                        <label class="bank-label">شماره شبا</label>
+                        <input type="text" class="bank-input iban-num" placeholder="IR00-0000-0000-0000-0000-0000-00" maxlength="32">
+                    </div>
+                    
+                    <div class="bank-field-group is-empty">
+                        <label class="bank-label">شماره حساب</label>
+                        <input type="text" class="bank-input acc-num" placeholder="0000-0000-0000-0000">
+                    </div>
+                `;
+                grid.appendChild(card);
+                setupCardEvents(card);
+            }
+
+            function setupCardEvents(card) {
+                const deleteBtn = card.querySelector('.btn-delete-card');
+                const nameInput = card.querySelector('.bank-name-input');
+                const cardInput = card.querySelector('.card-num');
+                const ibanInput = card.querySelector('.iban-num');
+                const accInput = card.querySelector('.acc-num');
+
+                deleteBtn.addEventListener('click', () => {
+                    if(confirm("آیا از حذف این کارت اطمینان دارید؟")) card.remove();
+                });
+
+                // تابع مهم: ذخیره مقدار در attribute برای اینکه در خروجی innerHTML وجود داشته باشد
+                const updateAttr = (input) => {
+                    input.setAttribute('value', input.value);
+                };
+
+                // بررسی و اعمال کلاس is-empty
+                const checkEmpty = (input) => {
+                    const group = input.closest('.bank-field-group');
+                    const val = input.value.trim();
+                    // شرط خالی بودن: متن خالی، یا فقط قالب اولیه
+                    if (!val || val === 'IR' || val === '-') {
+                        group.classList.add('is-empty');
+                    } else {
+                        group.classList.remove('is-empty');
+                    }
+                };
+
+                [nameInput, cardInput, ibanInput, accInput].forEach(input => {
+                    // مقداردهی اولیه
+                    updateAttr(input);
+                    if(input !== nameInput) checkEmpty(input);
+                    
+                    input.addEventListener('input', function() {
+                        updateAttr(this);
+                        if(this !== nameInput) checkEmpty(this);
+                    });
+                });
+
+                // --- منطق شماره کارت و تشخیص بانک ---
+                cardInput.addEventListener('input', function(e) {
+                    let value = this.value.replace(/\D/g, '');
+                    
+                    // تشخیص نام بانک
+                    if (value.length >= 6) {
+                        const bin = value.substring(0, 6);
+                        if (banks[bin]) {
+                            nameInput.value = banks[bin];
+                            nameInput.setAttribute('value', banks[bin]); // ذخیره فوری نام بانک
+                        }
+                    }
+                    
+                    let formatted = '';
+                    for (let i = 0; i < value.length; i++) {
+                        if (i > 0 && i % 4 === 0) formatted += '-';
+                        formatted += value[i];
+                    }
+                    this.value = formatted;
+                    updateAttr(this); // ذخیره فرمت جدید
+                });
+
+                // --- منطق شماره شبا ---
+                ibanInput.addEventListener('input', function() {
+                    let value = this.value.replace(/[^0-9]/g, ''); 
+                    let formatted = 'IR';
+                    for (let i = 0; i < value.length; i++) {
+                        if (i > 0 && i % 4 === 0) formatted += '-';
+                        formatted += value[i];
+                    }
+                    this.value = formatted;
+                    updateAttr(this);
+                });
+                if(!ibanInput.value) { 
+                    ibanInput.value = "IR"; 
+                    updateAttr(ibanInput); 
+                }
+
+                // --- منطق شماره حساب ---
+                accInput.addEventListener('input', function() {
+                    let value = this.value.replace(/\D/g, '');
+                    let formatted = '';
+                    for (let i = 0; i < value.length; i++) {
+                        if (i > 0 && i % 4 === 0) formatted += '-';
+                        formatted += value[i];
+                    }
+                    this.value = formatted;
+                    updateAttr(this);
+                });
+
+                // --- منطق کپی با تغییر متن ---
+                const inputs = [cardInput, ibanInput, accInput];
+                inputs.forEach(input => {
+                    input.addEventListener('click', function(e) {
+                        if (document.body.classList.contains('visitor-mode')) {
+                            e.preventDefault();
+                            
+                            if (this.getAttribute('data-copying') === 'true') return;
+
+                            const originalText = this.value;
+                            const textToCopy = originalText.replace(/-/g, '');
+
+                            const triggerFeedback = () => {
+                                this.setAttribute('data-copying', 'true');
+                                this.value = "کپی شد";
+                                this.classList.add('copy-success');
+                                
+                                setTimeout(() => {
+                                    this.value = originalText;
+                                    this.classList.remove('copy-success');
+                                    this.removeAttribute('data-copying');
+                                }, 2000);
+                            };
+
+                            if (navigator.clipboard) {
+                                navigator.clipboard.writeText(textToCopy).then(triggerFeedback);
+                            } else {
+                                this.select();
+                                document.execCommand('copy');
+                                triggerFeedback();
+                                window.getSelection().removeAllRanges();
+                            }
+                        }
+                    });
+                    
+                    input.addEventListener('keydown', function(e) {
+                        if (document.body.classList.contains('visitor-mode')) e.preventDefault();
+                    });
+                });
+            }
+
+            // راه‌اندازی اولیه
+            grid.querySelectorAll('.bank-card').forEach(setupCardEvents);
+
+        })();
+    </script>
+</section>
